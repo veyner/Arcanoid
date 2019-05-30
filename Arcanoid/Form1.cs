@@ -24,9 +24,7 @@ namespace Arcanoid
 
         private Point _direct = Point.Empty;
         private Block[,] blocks = new Block[0, 0];
-        //private const int x = 10;
-        //private const int y = 6;
-        //private Block[,] blocks = new Block[x, y];
+        private int life;
 
         public Form1()
         {
@@ -35,10 +33,13 @@ namespace Arcanoid
             UpdateStyles();
 
             platformHaste = PlatformHasteTrackBar.Value;
-            blocks = CreateBlocks(10, 6);
+
             DifficultyList();
             OptionsGroupBox.Visible = false;
             OptionsGroupBox.Enabled = false;
+
+            MainMenuGroupBox.Visible = true;
+            MainMenuGroupBox.Enabled = true;
         }
 
         private void MainWindow_Paint(object sender, PaintEventArgs e)
@@ -52,11 +53,11 @@ namespace Arcanoid
                 ball.Y += ballDirect.Y;
             }
 
-            if (ball.X < 0 || ball.X > 200)
+            if (ball.X <= 0 || ball.X >= 200)
             {
                 ballDirect.X *= -1;
             }
-            if (ball.Y < 0 || ball.Y > 300)
+            if (ball.Y <= 0 || ball.Y >= 300)
             {
                 ballDirect.Y *= -1;
             }
@@ -64,6 +65,21 @@ namespace Arcanoid
             if (platform.X <= ball.X + 2 && ball.X + 2 <= platform.X + 20 && platform.Y == ball.Y + 2)
             {
                 ballDirect.Y *= -1;
+            }
+
+            if (ball.Y >= 300)
+            {
+                life--;
+                if (life == 0)
+                {
+                    EndGame();
+                }
+                gameStarted = false;
+                ball.X = 97;
+                ball.Y = 286;
+
+                platform.X = 90;
+                platform.Y = 291;
             }
 
             graph.DrawEllipse(blackPen, ball);
@@ -75,23 +91,27 @@ namespace Arcanoid
                 switch (difficulty)
                 {
                     case "Легко":
-                        blocks = CreateBlocks(10, 6);
+                        blocks = CreateBlocks(10, 6, 40);
+                        life = 5;
                         break;
 
                     case "Среднe":
-                        blocks = CreateBlocks(10, 8);
+                        blocks = CreateBlocks(10, 8, 60);
+                        life = 3;
                         break;
 
                     case "Сложно":
-                        blocks = CreateBlocks(10, 12);
+                        blocks = CreateBlocks(10, 12, 70);
+                        life = 2;
                         break;
 
                     case "Ад":
-                        blocks = CreateBlocks(10, 18);
+                        blocks = CreateBlocks(10, 18, 95);
+                        life = 1;
                         break;
                 }
             }
-
+            lifeNumberLabel.Text = life.ToString();
             foreach (Block block in blocks)
             {
                 if (block.Visible)
@@ -173,8 +193,10 @@ namespace Arcanoid
             MainMenuGroupBox.Visible = false;
             MainMenuGroupBox.Enabled = false;
 
-            MainWindow.Visible = true;
-            MainWindow.Enabled = true;
+            GameGroupBox.Visible = true;
+            GameGroupBox.Enabled = true;
+
+            RefreshTimer.Enabled = true;
         }
 
         private void SaveChangesButton_Click(object sender, EventArgs e)
@@ -207,9 +229,10 @@ namespace Arcanoid
             DifficultyComboBox.DisplayMember = nameof(diffList);
         }
 
-        private Block[,] CreateBlocks(int x, int y)
+        private Block[,] CreateBlocks(int x, int y, int difficulty)
         {
             Block[,] blocks = new Block[x, y];
+            var random = new Random();
             for (int i = 0; i < x; i++)
             {
                 for (int j = 0; j < y; j++)
@@ -222,38 +245,19 @@ namespace Arcanoid
                             Y = j * 10
                         }
                     };
+                    var randomNumber = random.Next(1, 100);
+                    if (randomNumber >= 1 && randomNumber <= difficulty)
+                    {
+                        blocks[i, j].Visible = true;
+                    }
+                    else
+                    {
+                        blocks[i, j].Visible = false;
+                    }
                 }
             }
 
             return blocks;
-        }
-
-        private void Easy()
-        {
-            const int x = 10;
-            const int y = 6;
-
-            RefreshTimer.Interval = 5;
-        }
-
-        private void Mid()
-        {
-            const int x = 10;
-            const int y = 8;
-
-            RefreshTimer.Interval = 5;
-        }
-
-        private void Hard()
-        {
-            const int x = 10;
-            const int y = 12;
-        }
-
-        private void Hell()
-        {
-            const int x = 10;
-            const int y = 15;
         }
 
         private void ReturnButton_Click(object sender, EventArgs e)
@@ -263,6 +267,8 @@ namespace Arcanoid
 
             MainMenuGroupBox.Visible = true;
             MainMenuGroupBox.Enabled = true;
+
+            difficultyChanged = false;
         }
 
         private void ExitButton_Click(object sender, EventArgs e)
@@ -277,6 +283,31 @@ namespace Arcanoid
 
             MainMenuGroupBox.Visible = false;
             MainMenuGroupBox.Enabled = false;
+        }
+
+        private void EndGame()
+        {
+            RefreshTimer.Enabled = false;
+            var result = MessageBox.Show("Потрачено!");
+            if (result == DialogResult.OK)
+            {
+                MainMenuGroupBox.Visible = true;
+                MainMenuGroupBox.Enabled = true;
+
+                GameGroupBox.Visible = false;
+                GameGroupBox.Enabled = false;
+            }
+        }
+
+        private void ToMainMenuButton_Click(object sender, EventArgs e)
+        {
+            RefreshTimer.Enabled = false;
+            gameStarted = false;
+            MainMenuGroupBox.Visible = true;
+            MainMenuGroupBox.Enabled = true;
+
+            GameGroupBox.Visible = false;
+            GameGroupBox.Enabled = false;
         }
     }
 }

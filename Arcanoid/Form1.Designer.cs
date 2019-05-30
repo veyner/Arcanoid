@@ -35,7 +35,9 @@
             this.ExitButton = new System.Windows.Forms.Button();
             this.GameNameLabel = new System.Windows.Forms.Label();
             this.MainMenuGroupBox = new System.Windows.Forms.GroupBox();
+            this.OptionsButton = new System.Windows.Forms.Button();
             this.OptionsGroupBox = new System.Windows.Forms.GroupBox();
+            this.ReturnButton = new System.Windows.Forms.Button();
             this.SaveChangesButton = new System.Windows.Forms.Button();
             this.MaxHasteLabel = new System.Windows.Forms.Label();
             this.MinHasteLabel = new System.Windows.Forms.Label();
@@ -43,29 +45,31 @@
             this.PlatformHasteLabel = new System.Windows.Forms.Label();
             this.DifficultyLabel = new System.Windows.Forms.Label();
             this.DifficultyComboBox = new System.Windows.Forms.ComboBox();
-            this.OptionsButton = new System.Windows.Forms.Button();
-            this.ReturnButton = new System.Windows.Forms.Button();
+            this.GameGroupBox = new System.Windows.Forms.GroupBox();
+            this.LifeLabel = new System.Windows.Forms.Label();
+            this.Life2Label = new System.Windows.Forms.Label();
+            this.lifeNumberLabel = new System.Windows.Forms.Label();
+            this.ToMainMenuButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.MainWindow)).BeginInit();
             this.MainMenuGroupBox.SuspendLayout();
             this.OptionsGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PlatformHasteTrackBar)).BeginInit();
+            this.GameGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainWindow
             // 
             this.MainWindow.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.MainWindow.Enabled = false;
-            this.MainWindow.Location = new System.Drawing.Point(12, 12);
+            this.MainWindow.Location = new System.Drawing.Point(6, 14);
             this.MainWindow.Name = "MainWindow";
             this.MainWindow.Size = new System.Drawing.Size(203, 300);
             this.MainWindow.TabIndex = 0;
             this.MainWindow.TabStop = false;
-            this.MainWindow.Visible = false;
             this.MainWindow.Paint += new System.Windows.Forms.PaintEventHandler(this.MainWindow_Paint);
             // 
             // RefreshTimer
             // 
-            this.RefreshTimer.Interval = 5;
+            this.RefreshTimer.Interval = 1;
             this.RefreshTimer.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // StartGameButton
@@ -104,12 +108,22 @@
             this.MainMenuGroupBox.Controls.Add(this.GameNameLabel);
             this.MainMenuGroupBox.Controls.Add(this.ExitButton);
             this.MainMenuGroupBox.Controls.Add(this.StartGameButton);
-            this.MainMenuGroupBox.Location = new System.Drawing.Point(1, 1);
+            this.MainMenuGroupBox.Location = new System.Drawing.Point(627, 0);
             this.MainMenuGroupBox.Name = "MainMenuGroupBox";
-            this.MainMenuGroupBox.Size = new System.Drawing.Size(305, 327);
-            this.MainMenuGroupBox.TabIndex = 4;
+            this.MainMenuGroupBox.Size = new System.Drawing.Size(300, 320);
+            this.MainMenuGroupBox.TabIndex = 1;
             this.MainMenuGroupBox.TabStop = false;
             this.MainMenuGroupBox.Text = "Главное меню";
+            // 
+            // OptionsButton
+            // 
+            this.OptionsButton.Location = new System.Drawing.Point(80, 129);
+            this.OptionsButton.Name = "OptionsButton";
+            this.OptionsButton.Size = new System.Drawing.Size(135, 39);
+            this.OptionsButton.TabIndex = 4;
+            this.OptionsButton.Text = "Настройки";
+            this.OptionsButton.UseVisualStyleBackColor = true;
+            this.OptionsButton.Click += new System.EventHandler(this.OptionsButton_Click);
             // 
             // OptionsGroupBox
             // 
@@ -121,12 +135,22 @@
             this.OptionsGroupBox.Controls.Add(this.PlatformHasteLabel);
             this.OptionsGroupBox.Controls.Add(this.DifficultyLabel);
             this.OptionsGroupBox.Controls.Add(this.DifficultyComboBox);
-            this.OptionsGroupBox.Location = new System.Drawing.Point(1, 1);
+            this.OptionsGroupBox.Location = new System.Drawing.Point(306, 0);
             this.OptionsGroupBox.Name = "OptionsGroupBox";
-            this.OptionsGroupBox.Size = new System.Drawing.Size(305, 327);
+            this.OptionsGroupBox.Size = new System.Drawing.Size(300, 320);
             this.OptionsGroupBox.TabIndex = 5;
             this.OptionsGroupBox.TabStop = false;
             this.OptionsGroupBox.Text = "Настройки";
+            // 
+            // ReturnButton
+            // 
+            this.ReturnButton.Location = new System.Drawing.Point(12, 143);
+            this.ReturnButton.Name = "ReturnButton";
+            this.ReturnButton.Size = new System.Drawing.Size(98, 23);
+            this.ReturnButton.TabIndex = 7;
+            this.ReturnButton.Text = "Назад";
+            this.ReturnButton.UseVisualStyleBackColor = true;
+            this.ReturnButton.Click += new System.EventHandler(this.ReturnButton_Click);
             // 
             // SaveChangesButton
             // 
@@ -145,22 +169,22 @@
             this.MaxHasteLabel.Name = "MaxHasteLabel";
             this.MaxHasteLabel.Size = new System.Drawing.Size(19, 13);
             this.MaxHasteLabel.TabIndex = 5;
-            this.MaxHasteLabel.Text = "50";
+            this.MaxHasteLabel.Text = "30";
             // 
             // MinHasteLabel
             // 
             this.MinHasteLabel.AutoSize = true;
             this.MinHasteLabel.Location = new System.Drawing.Point(15, 95);
             this.MinHasteLabel.Name = "MinHasteLabel";
-            this.MinHasteLabel.Size = new System.Drawing.Size(19, 13);
+            this.MinHasteLabel.Size = new System.Drawing.Size(13, 13);
             this.MinHasteLabel.TabIndex = 4;
-            this.MinHasteLabel.Text = "10";
+            this.MinHasteLabel.Text = "5";
             // 
             // PlatformHasteTrackBar
             // 
             this.PlatformHasteTrackBar.Location = new System.Drawing.Point(12, 63);
-            this.PlatformHasteTrackBar.Maximum = 50;
-            this.PlatformHasteTrackBar.Minimum = 10;
+            this.PlatformHasteTrackBar.Maximum = 30;
+            this.PlatformHasteTrackBar.Minimum = 5;
             this.PlatformHasteTrackBar.Name = "PlatformHasteTrackBar";
             this.PlatformHasteTrackBar.Size = new System.Drawing.Size(181, 45);
             this.PlatformHasteTrackBar.TabIndex = 3;
@@ -193,34 +217,75 @@
             this.DifficultyComboBox.TabIndex = 0;
             this.DifficultyComboBox.SelectedIndexChanged += new System.EventHandler(this.DifficultyComboBox_SelectedIndexChanged);
             // 
-            // OptionsButton
+            // GameGroupBox
             // 
-            this.OptionsButton.Location = new System.Drawing.Point(80, 129);
-            this.OptionsButton.Name = "OptionsButton";
-            this.OptionsButton.Size = new System.Drawing.Size(135, 39);
-            this.OptionsButton.TabIndex = 4;
-            this.OptionsButton.Text = "Настройки";
-            this.OptionsButton.UseVisualStyleBackColor = true;
-            this.OptionsButton.Click += new System.EventHandler(this.OptionsButton_Click);
+            this.GameGroupBox.Controls.Add(this.LifeLabel);
+            this.GameGroupBox.Controls.Add(this.Life2Label);
+            this.GameGroupBox.Controls.Add(this.lifeNumberLabel);
+            this.GameGroupBox.Controls.Add(this.ToMainMenuButton);
+            this.GameGroupBox.Controls.Add(this.MainWindow);
+            this.GameGroupBox.Enabled = false;
+            this.GameGroupBox.Location = new System.Drawing.Point(0, 0);
+            this.GameGroupBox.Name = "GameGroupBox";
+            this.GameGroupBox.Size = new System.Drawing.Size(300, 320);
+            this.GameGroupBox.TabIndex = 14;
+            this.GameGroupBox.TabStop = false;
+            this.GameGroupBox.Visible = false;
             // 
-            // ReturnButton
+            // LifeLabel
             // 
-            this.ReturnButton.Location = new System.Drawing.Point(12, 143);
-            this.ReturnButton.Name = "ReturnButton";
-            this.ReturnButton.Size = new System.Drawing.Size(98, 23);
-            this.ReturnButton.TabIndex = 7;
-            this.ReturnButton.Text = "Назад";
-            this.ReturnButton.UseVisualStyleBackColor = true;
-            this.ReturnButton.Click += new System.EventHandler(this.ReturnButton_Click);
+            this.LifeLabel.AutoSize = true;
+            this.LifeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.LifeLabel.Location = new System.Drawing.Point(213, 173);
+            this.LifeLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.LifeLabel.Name = "LifeLabel";
+            this.LifeLabel.Size = new System.Drawing.Size(83, 20);
+            this.LifeLabel.TabIndex = 14;
+            this.LifeLabel.Text = "Осталось";
+            this.LifeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // Life2Label
+            // 
+            this.Life2Label.AutoSize = true;
+            this.Life2Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.Life2Label.Location = new System.Drawing.Point(223, 193);
+            this.Life2Label.Name = "Life2Label";
+            this.Life2Label.Size = new System.Drawing.Size(64, 20);
+            this.Life2Label.TabIndex = 17;
+            this.Life2Label.Text = "жизней";
+            // 
+            // lifeNumberLabel
+            // 
+            this.lifeNumberLabel.AutoSize = true;
+            this.lifeNumberLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
+            this.lifeNumberLabel.Location = new System.Drawing.Point(241, 213);
+            this.lifeNumberLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.lifeNumberLabel.Name = "lifeNumberLabel";
+            this.lifeNumberLabel.Size = new System.Drawing.Size(25, 37);
+            this.lifeNumberLabel.TabIndex = 15;
+            this.lifeNumberLabel.Text = "0";
+            this.lifeNumberLabel.UseCompatibleTextRendering = true;
+            // 
+            // ToMainMenuButton
+            // 
+            this.ToMainMenuButton.Location = new System.Drawing.Point(214, 269);
+            this.ToMainMenuButton.Margin = new System.Windows.Forms.Padding(0);
+            this.ToMainMenuButton.Name = "ToMainMenuButton";
+            this.ToMainMenuButton.Size = new System.Drawing.Size(78, 40);
+            this.ToMainMenuButton.TabIndex = 16;
+            this.ToMainMenuButton.TabStop = false;
+            this.ToMainMenuButton.Text = "В главное меню";
+            this.ToMainMenuButton.UseVisualStyleBackColor = true;
+            this.ToMainMenuButton.Click += new System.EventHandler(this.ToMainMenuButton_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(309, 331);
+            this.ClientSize = new System.Drawing.Size(1072, 588);
             this.Controls.Add(this.MainMenuGroupBox);
             this.Controls.Add(this.OptionsGroupBox);
-            this.Controls.Add(this.MainWindow);
+            this.Controls.Add(this.GameGroupBox);
             this.Name = "Form1";
             this.Text = "Form1";
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
@@ -230,6 +295,8 @@
             this.OptionsGroupBox.ResumeLayout(false);
             this.OptionsGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PlatformHasteTrackBar)).EndInit();
+            this.GameGroupBox.ResumeLayout(false);
+            this.GameGroupBox.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -252,6 +319,11 @@
         private System.Windows.Forms.ComboBox DifficultyComboBox;
         private System.Windows.Forms.Button OptionsButton;
         private System.Windows.Forms.Button ReturnButton;
+        private System.Windows.Forms.GroupBox GameGroupBox;
+        private System.Windows.Forms.Label LifeLabel;
+        private System.Windows.Forms.Label Life2Label;
+        private System.Windows.Forms.Label lifeNumberLabel;
+        private System.Windows.Forms.Button ToMainMenuButton;
     }
 }
 
