@@ -9,7 +9,7 @@ namespace Arcanoid
 {
     public class Block
     {
-        public Point Position { get; set; }
+        public PointF Position { get; set; }
         public bool Visible { get; set; }
 
         public Block()

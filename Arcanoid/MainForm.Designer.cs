@@ -69,6 +69,7 @@
             this.MainWindow.Size = new System.Drawing.Size(203, 300);
             this.MainWindow.TabIndex = 0;
             this.MainWindow.TabStop = false;
+            this.MainWindow.SizeChanged += new System.EventHandler(this.MainWindow_SizeChanged);
             this.MainWindow.Paint += new System.Windows.Forms.PaintEventHandler(this.MainWindow_Paint);
             // 
             // RefreshTimer
@@ -324,7 +325,8 @@
             this.MinimumSize = new System.Drawing.Size(323, 362);
             this.Name = "MainForm";
             this.Text = "Form1";
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
             ((System.ComponentModel.ISupportInitialize)(this.MainWindow)).EndInit();
             this.MainMenuGroupBox.ResumeLayout(false);
             this.MainMenuGroupBox.PerformLayout();

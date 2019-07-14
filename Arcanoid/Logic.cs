@@ -9,11 +9,11 @@ namespace Arcanoid
 {
     public class Logic
     {
-        private PointF ballDirect = new PointF(-1, -1);
+        private PointF ballDirect;
 
         //private Rectangle platform = new Rectangle(90, 291, 20, 5);
         //private RectangleF ball = new RectangleF(97, 286, 4, 4);
-        public Point platformPosition;
+        public PointF platformPosition;
 
         public PointF ballPosition;
         private int _platformHaste;
@@ -23,13 +23,30 @@ namespace Arcanoid
 
         private MainForm _form;
 
+        private int mainWindowWidth;
+        private int mainWindowHeight;
+
         public Logic(int platformHaste, MainForm form)
         {
             _platformHaste = platformHaste;
             _form = form;
+            //mainWindowWight = 200;
+            //mainWindowHeight = 300;
 
-            platformPosition = new Point(90, 291);
-            ballPosition = new PointF(97, 286);
+            platformPosition = new PointF((float)0.45 * mainWindowWidth, (float)0.97 * mainWindowHeight);
+            ballPosition = new PointF((float)0.485 * mainWindowWidth, (float)0.953 * mainWindowHeight);
+            ballDirect = new PointF((float)-0.0033 * mainWindowWidth, (float)-0.0033 * mainWindowHeight);
+        }
+
+        public void MainWindowSize(int height, int width)
+        {
+            mainWindowHeight = height;
+            mainWindowWidth = width;
+        }
+
+        private int ConvertFloatToInt(float i, int size)
+        {
+            return Convert.ToInt32(i * size);
         }
 
         /// <summary>
@@ -44,21 +61,21 @@ namespace Arcanoid
                     ballPosition.Y += ballDirect.Y;
                 }
                 //проверка пересечения рамок окна
-                if (ballPosition.X <= 0 || ballPosition.X >= 200)
+                if (ballPosition.X <= 0 || ballPosition.X >= mainWindowWidth)
                 {
                     ballDirect.X *= -1;
                 }
-                if (ballPosition.Y <= 0 || ballPosition.Y >= 300)
+                if (ballPosition.Y <= 0 || ballPosition.Y >= mainWindowHeight)
                 {
                     ballDirect.Y *= -1;
                 }
                 //пересечение шарика и платформы
-                if (platformPosition.X <= ballPosition.X + 2 && ballPosition.X + 2 <= platformPosition.X + 20 && platformPosition.Y == ballPosition.Y + 2)
+                if (platformPosition.X <= ballPosition.X + (0.01 * mainWindowWidth) && ballPosition.X + (0.01 * mainWindowWidth) <= platformPosition.X + (0.1 * mainWindowWidth) && platformPosition.Y == ballPosition.Y + (0.01 * mainWindowHeight))
                 {
                     ballDirect.Y *= -1;
                 }
 
-                if (ballPosition.Y >= 300)
+                if (ballPosition.Y >= mainWindowHeight)
                 {
                     life--;
                     if (life == 0)
@@ -78,25 +95,25 @@ namespace Arcanoid
                         var point = block.Position;
                         _form.AddBlocksAsRectangles(point);
 
-                        if (point.X <= ballPosition.X + 2 && ballPosition.X + 2 <= point.X + 20 && point.Y == ballPosition.Y + 2)
+                        if (point.X <= ballPosition.X + (0.01 * mainWindowWidth) && ballPosition.X + (0.01 * mainWindowWidth) <= point.X + (0.1 * mainWindowWidth) && point.Y == ballPosition.Y + (0.01 * mainWindowHeight))
                         {
                             ballDirect.Y *= -1;
                             block.Visible = false;
                             break;
                         }
-                        if (point.X <= ballPosition.X + 2 && ballPosition.X + 2 <= point.X + 20 && ballPosition.Y + 2 == point.Y + 10)
+                        if (point.X <= ballPosition.X + (0.01 * mainWindowWidth) && ballPosition.X + (0.01 * mainWindowWidth) <= point.X + (0.1 * mainWindowWidth) && ballPosition.Y + (0.01 * mainWindowHeight) == point.Y + (0.05 * mainWindowHeight))
                         {
                             ballDirect.Y *= -1;
                             block.Visible = false;
                             break;
                         }
-                        if (point.Y <= ballPosition.Y + 2 && ballPosition.Y + 2 <= point.Y + 10 && ballPosition.X + 2 == point.X)
+                        if (point.Y <= ballPosition.Y + (0.01 * mainWindowHeight) && ballPosition.Y + (0.01 * mainWindowHeight) <= point.Y + (0.05 * mainWindowHeight) && ballPosition.X + (0.01 * mainWindowWidth) == point.X)
                         {
                             ballDirect.X *= -1;
                             block.Visible = false;
                             break;
                         }
-                        if (point.Y <= ballPosition.Y + 2 && ballPosition.Y + 2 <= point.Y + 10 && ballPosition.X + 2 == point.X + 20)
+                        if (point.Y <= ballPosition.Y + (0.01 * mainWindowHeight) && ballPosition.Y + (0.01 * mainWindowHeight) <= point.Y + (0.05 * mainWindowHeight) && ballPosition.X + (0.01 * mainWindowWidth) == point.X + (0.1 * mainWindowWidth))
                         {
                             ballDirect.X *= -1;
                             block.Visible = false;
@@ -214,10 +231,10 @@ namespace Arcanoid
         private void StartPlatformAndBallPosition()
         {
             _form.gameStarted = false;
-            ballPosition.X = 97;
-            ballPosition.Y = 286;
-            platformPosition.X = 90;
-            platformPosition.Y = 291;
+            ballPosition.X = (float)0.485 * mainWindowWidth;
+            ballPosition.Y = (float)0.953 * mainWindowHeight;
+            platformPosition.X = (float)0.45 * mainWindowWidth;
+            platformPosition.Y = (float)0.97 * mainWindowHeight;
         }
 
         /// <summary>
@@ -237,10 +254,10 @@ namespace Arcanoid
                 {
                     blocks[i, j] = new Block
                     {
-                        Position = new Point
+                        Position = new PointF
                         {
-                            X = i * 20,
-                            Y = j * 10
+                            X = float.Parse(i.ToString()) * ((float)0.1 * mainWindowWidth),
+                            Y = float.Parse(j.ToString()) * ((float)0.05 * mainWindowHeight)
                         }
                     };
                     var randomNumber = random.Next(1, 100);
@@ -281,7 +298,7 @@ namespace Arcanoid
         /// </summary>
         public void ChangePlatformPositionToRight()
         {
-            if (platformPosition.X < 180)
+            if (platformPosition.X < 0.9 * mainWindowWidth)
             {
                 platformPosition.X += _platformHaste;
                 if (!_form.gameStarted)

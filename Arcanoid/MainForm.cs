@@ -39,10 +39,12 @@ namespace Arcanoid
             this.Load += Form1_CreateBackBuffer;
             difficulty = (string)DifficultyComboBox.SelectedItem;
             platformHaste = PlatformHasteTrackBar.Value;
+
             logic = new Logic(platformHaste, this);
 
             ball = new RectangleF(0, 0, 4, 4);
             platform = new Rectangle(0, 0, 20, 5);
+            logic.MainWindowSize(MainWindow.Height, MainWindow.Width);
         }
 
         private void MainWindow_Paint(object sender, PaintEventArgs e)
@@ -81,9 +83,11 @@ namespace Arcanoid
         /// создание блока для отрисовки по вычисленным позициям
         /// </summary>
         /// <param name="position">позиция блока</param>
-        public void AddBlocksAsRectangles(Point position)
+        public void AddBlocksAsRectangles(PointF position)
         {
-            var rect = new Rectangle(position.X, position.Y, 20, 10);
+            var x = Convert.ToInt32(position.X);
+            var y = Convert.ToInt32(position.Y);
+            var rect = new Rectangle(x, y, 20, 10);
             rectList.Add(rect);
         }
 
@@ -111,8 +115,8 @@ namespace Arcanoid
                     ball.Y = ballPosition.Y;
                     graph.DrawEllipse(blackPen, ball);
                     var platformPosition = logic.platformPosition;
-                    platform.X = platformPosition.X;
-                    platform.Y = platformPosition.Y;
+                    platform.X = Convert.ToInt32(platformPosition.X);
+                    platform.Y = Convert.ToInt32(platformPosition.Y);
                     graph.DrawRectangle(blackPen, platform);
                     foreach (Rectangle rect in rectList)
                     {
@@ -120,25 +124,6 @@ namespace Arcanoid
                     }
                     Invalidate();
                 }
-            }
-        }
-
-        private void Form1_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Left)
-            {
-                logic.ChangePlatformPositionToLeft();
-            }
-            if (e.KeyCode == Keys.Right)
-            {
-                logic.ChangePlatformPositionToRight();
-            }
-
-            if (e.KeyCode == Keys.Enter)
-            {
-                RefreshTimer.Enabled = true;
-                BufferTimer.Enabled = true;
-                gameStarted = true;
             }
         }
 
@@ -247,6 +232,33 @@ namespace Arcanoid
         public void RefreshMainWindow()
         {
             MainWindow.Refresh();
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Left)
+            {
+                logic.ChangePlatformPositionToLeft();
+            }
+            if (e.KeyCode == Keys.Right)
+            {
+                logic.ChangePlatformPositionToRight();
+            }
+        }
+
+        private void MainForm_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                RefreshTimer.Enabled = true;
+                BufferTimer.Enabled = true;
+                gameStarted = true;
+            }
+        }
+
+        private void MainWindow_SizeChanged(object sender, EventArgs e)
+        {
+            logic.MainWindowSize(MainWindow.Height, MainWindow.Width);
         }
     }
 }
