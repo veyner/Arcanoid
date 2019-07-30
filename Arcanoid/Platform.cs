@@ -7,16 +7,10 @@ using System.Drawing;
 
 namespace Arcanoid
 {
-    public class Block
+    public class Platform
     {
-        public Point Position;
-        public bool Visible { get; set; }
+        public PointF Position;
         public int Height { get; set; }
         public int Width { get; set; }
-
-        public Block()
-        {
-            Visible = true;
-        }
     }
 }

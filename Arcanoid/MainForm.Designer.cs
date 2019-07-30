@@ -46,6 +46,8 @@
             this.DifficultyLabel = new System.Windows.Forms.Label();
             this.DifficultyComboBox = new System.Windows.Forms.ComboBox();
             this.GameGroupBox = new System.Windows.Forms.GroupBox();
+            this.ContinueButton = new System.Windows.Forms.Button();
+            this.PauseButton = new System.Windows.Forms.Button();
             this.LifeLabel = new System.Windows.Forms.Label();
             this.Life2Label = new System.Windows.Forms.Label();
             this.lifeNumberLabel = new System.Windows.Forms.Label();
@@ -64,6 +66,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.MainWindow.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.MainWindow.Enabled = false;
             this.MainWindow.Location = new System.Drawing.Point(6, 14);
             this.MainWindow.Name = "MainWindow";
             this.MainWindow.Size = new System.Drawing.Size(203, 300);
@@ -79,12 +82,10 @@
             // 
             // StartGameButton
             // 
-            this.StartGameButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.StartGameButton.Location = new System.Drawing.Point(80, 84);
+            this.StartGameButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.StartGameButton.Location = new System.Drawing.Point(87, 84);
             this.StartGameButton.Name = "StartGameButton";
-            this.StartGameButton.Size = new System.Drawing.Size(135, 39);
+            this.StartGameButton.Size = new System.Drawing.Size(121, 39);
             this.StartGameButton.TabIndex = 1;
             this.StartGameButton.Text = "Новая игра";
             this.StartGameButton.UseVisualStyleBackColor = true;
@@ -92,12 +93,10 @@
             // 
             // ExitButton
             // 
-            this.ExitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ExitButton.Location = new System.Drawing.Point(80, 174);
+            this.ExitButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.ExitButton.Location = new System.Drawing.Point(87, 174);
             this.ExitButton.Name = "ExitButton";
-            this.ExitButton.Size = new System.Drawing.Size(135, 39);
+            this.ExitButton.Size = new System.Drawing.Size(121, 39);
             this.ExitButton.TabIndex = 2;
             this.ExitButton.Text = "Выход";
             this.ExitButton.UseVisualStyleBackColor = true;
@@ -105,12 +104,10 @@
             // 
             // GameNameLabel
             // 
-            this.GameNameLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.GameNameLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.GameNameLabel.AutoSize = true;
             this.GameNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F);
-            this.GameNameLabel.Location = new System.Drawing.Point(104, 37);
+            this.GameNameLabel.Location = new System.Drawing.Point(111, 37);
             this.GameNameLabel.Name = "GameNameLabel";
             this.GameNameLabel.Size = new System.Drawing.Size(92, 24);
             this.GameNameLabel.TabIndex = 3;
@@ -118,11 +115,12 @@
             // 
             // MainMenuGroupBox
             // 
+            this.MainMenuGroupBox.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.MainMenuGroupBox.Controls.Add(this.OptionsButton);
             this.MainMenuGroupBox.Controls.Add(this.GameNameLabel);
             this.MainMenuGroupBox.Controls.Add(this.ExitButton);
             this.MainMenuGroupBox.Controls.Add(this.StartGameButton);
-            this.MainMenuGroupBox.Location = new System.Drawing.Point(3, 0);
+            this.MainMenuGroupBox.Location = new System.Drawing.Point(672, 0);
             this.MainMenuGroupBox.Name = "MainMenuGroupBox";
             this.MainMenuGroupBox.Size = new System.Drawing.Size(300, 320);
             this.MainMenuGroupBox.TabIndex = 1;
@@ -131,12 +129,10 @@
             // 
             // OptionsButton
             // 
-            this.OptionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.OptionsButton.Location = new System.Drawing.Point(80, 129);
+            this.OptionsButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.OptionsButton.Location = new System.Drawing.Point(87, 129);
             this.OptionsButton.Name = "OptionsButton";
-            this.OptionsButton.Size = new System.Drawing.Size(135, 39);
+            this.OptionsButton.Size = new System.Drawing.Size(121, 39);
             this.OptionsButton.TabIndex = 4;
             this.OptionsButton.Text = "Настройки";
             this.OptionsButton.UseVisualStyleBackColor = true;
@@ -144,6 +140,7 @@
             // 
             // OptionsGroupBox
             // 
+            this.OptionsGroupBox.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.OptionsGroupBox.Controls.Add(this.ReturnButton);
             this.OptionsGroupBox.Controls.Add(this.SaveChangesButton);
             this.OptionsGroupBox.Controls.Add(this.MaxHasteLabel);
@@ -152,7 +149,7 @@
             this.OptionsGroupBox.Controls.Add(this.PlatformHasteLabel);
             this.OptionsGroupBox.Controls.Add(this.DifficultyLabel);
             this.OptionsGroupBox.Controls.Add(this.DifficultyComboBox);
-            this.OptionsGroupBox.Location = new System.Drawing.Point(3, 0);
+            this.OptionsGroupBox.Location = new System.Drawing.Point(354, 0);
             this.OptionsGroupBox.Name = "OptionsGroupBox";
             this.OptionsGroupBox.Size = new System.Drawing.Size(300, 320);
             this.OptionsGroupBox.TabIndex = 5;
@@ -237,24 +234,54 @@
             // 
             // GameGroupBox
             // 
+            this.GameGroupBox.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.GameGroupBox.Controls.Add(this.ContinueButton);
+            this.GameGroupBox.Controls.Add(this.PauseButton);
             this.GameGroupBox.Controls.Add(this.LifeLabel);
             this.GameGroupBox.Controls.Add(this.Life2Label);
             this.GameGroupBox.Controls.Add(this.lifeNumberLabel);
             this.GameGroupBox.Controls.Add(this.ToMainMenuButton);
             this.GameGroupBox.Controls.Add(this.MainWindow);
             this.GameGroupBox.Enabled = false;
-            this.GameGroupBox.Location = new System.Drawing.Point(3, 0);
+            this.GameGroupBox.Location = new System.Drawing.Point(10, 0);
             this.GameGroupBox.Name = "GameGroupBox";
             this.GameGroupBox.Size = new System.Drawing.Size(300, 320);
             this.GameGroupBox.TabIndex = 14;
             this.GameGroupBox.TabStop = false;
             this.GameGroupBox.Visible = false;
             // 
+            // ContinueButton
+            // 
+            this.ContinueButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ContinueButton.Enabled = false;
+            this.ContinueButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.7F);
+            this.ContinueButton.Location = new System.Drawing.Point(212, 229);
+            this.ContinueButton.Margin = new System.Windows.Forms.Padding(0);
+            this.ContinueButton.Name = "ContinueButton";
+            this.ContinueButton.Size = new System.Drawing.Size(83, 39);
+            this.ContinueButton.TabIndex = 19;
+            this.ContinueButton.TabStop = false;
+            this.ContinueButton.Text = "Продолжить";
+            this.ContinueButton.UseVisualStyleBackColor = true;
+            this.ContinueButton.Visible = false;
+            this.ContinueButton.Click += new System.EventHandler(this.ContinueButton_Click);
+            // 
+            // PauseButton
+            // 
+            this.PauseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.PauseButton.Location = new System.Drawing.Point(212, 229);
+            this.PauseButton.Margin = new System.Windows.Forms.Padding(0);
+            this.PauseButton.Name = "PauseButton";
+            this.PauseButton.Size = new System.Drawing.Size(83, 39);
+            this.PauseButton.TabIndex = 18;
+            this.PauseButton.TabStop = false;
+            this.PauseButton.Text = "Пауза";
+            this.PauseButton.UseVisualStyleBackColor = true;
+            this.PauseButton.Click += new System.EventHandler(this.PauseButton_Click);
+            // 
             // LifeLabel
             // 
-            this.LifeLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.LifeLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.LifeLabel.AutoSize = true;
             this.LifeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.LifeLabel.Location = new System.Drawing.Point(212, 152);
@@ -267,9 +294,7 @@
             // 
             // Life2Label
             // 
-            this.Life2Label.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.Life2Label.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.Life2Label.AutoSize = true;
             this.Life2Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Life2Label.Location = new System.Drawing.Point(222, 172);
@@ -280,9 +305,7 @@
             // 
             // lifeNumberLabel
             // 
-            this.lifeNumberLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lifeNumberLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lifeNumberLabel.AutoSize = true;
             this.lifeNumberLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
             this.lifeNumberLabel.Location = new System.Drawing.Point(240, 192);
@@ -295,13 +318,11 @@
             // 
             // ToMainMenuButton
             // 
-            this.ToMainMenuButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ToMainMenuButton.Location = new System.Drawing.Point(214, 256);
+            this.ToMainMenuButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ToMainMenuButton.Location = new System.Drawing.Point(212, 275);
             this.ToMainMenuButton.Margin = new System.Windows.Forms.Padding(0);
             this.ToMainMenuButton.Name = "ToMainMenuButton";
-            this.ToMainMenuButton.Size = new System.Drawing.Size(77, 39);
+            this.ToMainMenuButton.Size = new System.Drawing.Size(83, 39);
             this.ToMainMenuButton.TabIndex = 16;
             this.ToMainMenuButton.TabStop = false;
             this.ToMainMenuButton.Text = "В главное меню";
@@ -317,11 +338,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(307, 323);
+            this.ClientSize = new System.Drawing.Size(1039, 323);
             this.Controls.Add(this.MainMenuGroupBox);
             this.Controls.Add(this.OptionsGroupBox);
             this.Controls.Add(this.GameGroupBox);
-            this.MaximumSize = new System.Drawing.Size(323, 362);
+            this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(323, 362);
             this.Name = "MainForm";
             this.Text = "Form1";
@@ -363,6 +384,8 @@
         private System.Windows.Forms.Label lifeNumberLabel;
         private System.Windows.Forms.Button ToMainMenuButton;
         private System.Windows.Forms.Timer BufferTimer;
+        private System.Windows.Forms.Button PauseButton;
+        private System.Windows.Forms.Button ContinueButton;
     }
 }
 

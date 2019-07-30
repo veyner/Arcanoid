@@ -9,45 +9,51 @@ namespace Arcanoid
 {
     public class Logic
     {
-        private PointF ballDirect;
-
         //private Rectangle platform = new Rectangle(90, 291, 20, 5);
         //private RectangleF ball = new RectangleF(97, 286, 4, 4);
-        public PointF platformPosition;
+        //public Point platformPosition;
 
-        public PointF ballPosition;
-        private int _platformHaste;
-
-        private Block[,] blocks = new Block[0, 0];
-        private int life;
+        //public PointF ballPosition;
 
         private MainForm _form;
 
-        private int mainWindowWidth;
-        private int mainWindowHeight;
+        //private int mainWindowWidth;
+        //private int mainWindowHeight;
+        public int virtualHeight = 300;
 
-        public Logic(int platformHaste, MainForm form)
+        public int virtualWidth = 200;
+
+        public GameState gameState = new GameState();
+        private PointF ballDirect = new PointF(-1, -1);
+
+        public Logic(MainForm form)
         {
-            _platformHaste = platformHaste;
             _form = form;
-            //mainWindowWight = 200;
-            //mainWindowHeight = 300;
-
-            platformPosition = new PointF((float)0.45 * mainWindowWidth, (float)0.97 * mainWindowHeight);
-            ballPosition = new PointF((float)0.485 * mainWindowWidth, (float)0.953 * mainWindowHeight);
-            ballDirect = new PointF((float)-0.0033 * mainWindowWidth, (float)-0.0033 * mainWindowHeight);
+            //mainWindowWidth = 300;
+            //mainWindowHeight = 400;
+            //MainWindowSize(height, width);
+            //ballDirect = new PointF(-1, -1);
+            //ScalingPositionsOfObjects(mainWindowHeight, mainWindowWidth);
         }
 
-        public void MainWindowSize(int height, int width)
-        {
-            mainWindowHeight = height;
-            mainWindowWidth = width;
-        }
+        //public void ScalingPositionsOfObjects(int height, int width)
+        //{
+        //    platformPosition = new PointF(ConvertFloatToInt((float)0.45, width), ConvertFloatToInt((float)0.97, height));
+        //    ballPosition = new PointF(ConvertFloatToInt((float)0.485, width), ConvertFloatToInt((float)0.953, height));
 
-        private int ConvertFloatToInt(float i, int size)
-        {
-            return Convert.ToInt32(i * size);
-        }
+        //    ScalingBlockPositions(height, width);
+        //}
+
+        //public void MainWindowSize(int height, int width)
+        //{
+        //    mainWindowHeight = height;
+        //    mainWindowWidth = width;
+        //}
+
+        //public int ConvertFloatToInt(float i, int size)
+        //{
+        //    return Convert.ToInt32(i * size);
+        //}
 
         /// <summary>
         /// Просчет положения шарика, проверка столкновений шарика и блоков
@@ -55,68 +61,72 @@ namespace Arcanoid
         public void GameLogic()
         {
             {
-                if (_form.gameStarted)
+                if (_form.gameStarted && !_form.pause)
                 {
-                    ballPosition.X += ballDirect.X;
-                    ballPosition.Y += ballDirect.Y;
+                    gameState.Ball.Position.X += ballDirect.X;
+                    gameState.Ball.Position.Y += ballDirect.Y;
                 }
                 //проверка пересечения рамок окна
-                if (ballPosition.X <= 0 || ballPosition.X >= mainWindowWidth)
+                if (gameState.Ball.Position.X <= 0 || gameState.Ball.Position.X >= virtualWidth)
                 {
                     ballDirect.X *= -1;
                 }
-                if (ballPosition.Y <= 0 || ballPosition.Y >= mainWindowHeight)
+                if (gameState.Ball.Position.Y <= 0 || gameState.Ball.Position.Y >= virtualHeight)
                 {
                     ballDirect.Y *= -1;
                 }
                 //пересечение шарика и платформы
-                if (platformPosition.X <= ballPosition.X + (0.01 * mainWindowWidth) && ballPosition.X + (0.01 * mainWindowWidth) <= platformPosition.X + (0.1 * mainWindowWidth) && platformPosition.Y == ballPosition.Y + (0.01 * mainWindowHeight))
+                if (gameState.Platform.Position.X <= gameState.Ball.Position.X + gameState.Ball.Diameter / 2 && gameState.Ball.Position.X + gameState.Ball.Diameter / 2 <= gameState.Platform.Position.X + gameState.Platform.Width && gameState.Platform.Position.Y == gameState.Ball.Position.Y + gameState.Ball.Diameter / 2)
                 {
                     ballDirect.Y *= -1;
                 }
 
-                if (ballPosition.Y >= mainWindowHeight)
+                if (gameState.Ball.Position.Y >= virtualHeight)
                 {
-                    life--;
-                    if (life == 0)
+                    gameState.Life--;
+                    if (gameState.Life == 0)
                     {
                         _form.EndGame();
                     }
-                    StartPlatformAndBallPosition();
+                    _form.gameStarted = false;
+                    gameState.StartPositions();
                 }
 
-                _form.ChangeLifeLabel(life.ToString());
+                _form.ChangeLifeLabel(gameState.Life.ToString());
                 _form.CleanRectangleList();
                 //проверка позиции шарика относительно блоков
-                foreach (Block block in blocks)
+                foreach (Block block in gameState.Blocks)
                 {
                     if (block.Visible)
                     {
                         var point = block.Position;
-                        _form.AddBlocksAsRectangles(point);
 
-                        if (point.X <= ballPosition.X + (0.01 * mainWindowWidth) && ballPosition.X + (0.01 * mainWindowWidth) <= point.X + (0.1 * mainWindowWidth) && point.Y == ballPosition.Y + (0.01 * mainWindowHeight))
+                        if (point.X <= gameState.Ball.Position.X + gameState.Ball.Diameter / 2 && gameState.Ball.Position.X + gameState.Ball.Diameter / 2 <= point.X + block.Width && point.Y == gameState.Ball.Position.Y + gameState.Ball.Diameter / 2)
                         {
                             ballDirect.Y *= -1;
                             block.Visible = false;
+
                             break;
                         }
-                        if (point.X <= ballPosition.X + (0.01 * mainWindowWidth) && ballPosition.X + (0.01 * mainWindowWidth) <= point.X + (0.1 * mainWindowWidth) && ballPosition.Y + (0.01 * mainWindowHeight) == point.Y + (0.05 * mainWindowHeight))
+                        if (point.X <= gameState.Ball.Position.X + gameState.Ball.Diameter / 2 && gameState.Ball.Position.X + gameState.Ball.Diameter / 2 <= point.X + block.Width && gameState.Ball.Position.Y + gameState.Ball.Diameter / 2 == point.Y + block.Height)
                         {
                             ballDirect.Y *= -1;
                             block.Visible = false;
+
                             break;
                         }
-                        if (point.Y <= ballPosition.Y + (0.01 * mainWindowHeight) && ballPosition.Y + (0.01 * mainWindowHeight) <= point.Y + (0.05 * mainWindowHeight) && ballPosition.X + (0.01 * mainWindowWidth) == point.X)
+                        if (point.Y <= gameState.Ball.Position.Y + gameState.Ball.Diameter / 2 && gameState.Ball.Position.Y + gameState.Ball.Diameter / 2 <= point.Y + block.Height && gameState.Ball.Position.X + gameState.Ball.Diameter / 2 == point.X)
                         {
                             ballDirect.X *= -1;
                             block.Visible = false;
+
                             break;
                         }
-                        if (point.Y <= ballPosition.Y + (0.01 * mainWindowHeight) && ballPosition.Y + (0.01 * mainWindowHeight) <= point.Y + (0.05 * mainWindowHeight) && ballPosition.X + (0.01 * mainWindowWidth) == point.X + (0.1 * mainWindowWidth))
+                        if (point.Y <= gameState.Ball.Position.Y + gameState.Ball.Diameter / 2 && gameState.Ball.Position.Y + gameState.Ball.Diameter / 2 <= point.Y + block.Height && gameState.Ball.Position.X + gameState.Ball.Diameter / 2 == point.X + block.Width)
                         {
                             ballDirect.X *= -1;
                             block.Visible = false;
+
                             break;
                         }
                         //if (rect.Contains(ball))
@@ -193,100 +203,40 @@ namespace Arcanoid
             }
         }
 
-        /// <summary>
-        /// загрузка стартового положения шарика, платформы и установленной сложности
-        /// </summary>
-        /// <param name="currentDifficulty">текущая сложность</param>
-        public void StartGame(string currentDifficulty)
-        {
-            StartPlatformAndBallPosition();
-            switch (currentDifficulty)
-            {
-                case "Легко":
-                    blocks = CreateBlocks(10, 6, 40);
-                    life = 5;
-                    break;
-
-                case "Среднe":
-                    blocks = CreateBlocks(10, 8, 60);
-                    life = 3;
-                    break;
-
-                case "Сложно":
-                    blocks = CreateBlocks(10, 12, 70);
-                    life = 2;
-                    break;
-
-                case "Ад":
-                    blocks = CreateBlocks(10, 18, 95);
-                    life = 1;
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// стартовая позиция платформы и шарика
-        /// (и в начале игры и после потери жизни)
-        /// </summary>
-        private void StartPlatformAndBallPosition()
-        {
-            _form.gameStarted = false;
-            ballPosition.X = (float)0.485 * mainWindowWidth;
-            ballPosition.Y = (float)0.953 * mainWindowHeight;
-            platformPosition.X = (float)0.45 * mainWindowWidth;
-            platformPosition.Y = (float)0.97 * mainWindowHeight;
-        }
-
-        /// <summary>
-        /// Создание массива с блоками
-        /// </summary>
-        /// <param name="x">координата X блока</param>
-        /// <param name="y">координата Y блока</param>
-        /// <param name="difficulty">текущая сложность</param>
-        /// <returns></returns>
-        private Block[,] CreateBlocks(int x, int y, int difficulty)
-        {
-            Block[,] blocks = new Block[x, y];
-            var random = new Random();
-            for (int i = 0; i < x; i++)
-            {
-                for (int j = 0; j < y; j++)
-                {
-                    blocks[i, j] = new Block
-                    {
-                        Position = new PointF
-                        {
-                            X = float.Parse(i.ToString()) * ((float)0.1 * mainWindowWidth),
-                            Y = float.Parse(j.ToString()) * ((float)0.05 * mainWindowHeight)
-                        }
-                    };
-                    var randomNumber = random.Next(1, 100);
-                    if (randomNumber >= 1 && randomNumber <= difficulty)
-                    {
-                        blocks[i, j].Visible = true;
-                    }
-                    else
-                    {
-                        blocks[i, j].Visible = false;
-                    }
-                }
-            }
-
-            return blocks;
-        }
+        //private void ScalingBlockPositions(int height, int width)
+        //{
+        //    if (blocks.Length != 0)
+        //    {
+        //        int x = blocks.GetUpperBound(0) + 1;
+        //        int y = blocks.Length / x;
+        //        for (int i = 0; i < x; i++)
+        //        {
+        //            for (int j = 0; j < y; j++)
+        //            {
+        //                blocks[i, j].Position = new PointF
+        //                {
+        //                    X = float.Parse(i.ToString()) * ConvertFloatToInt((float)0.1, width),
+        //                    Y = float.Parse(j.ToString()) * ConvertFloatToInt((float)0.033, height)
+        //                };
+        //            }
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// перемещение платформы влево
         /// в начале игры и после потери жизни вместе с платформой двигается шарик
         /// </summary>
-        public void ChangePlatformPositionToLeft()
+        public void ChangePlatformPositionToLeft(int platformHaste)
         {
-            if (platformPosition.X > 0)
+            if (gameState.Platform.Position.X - platformHaste > 0)
             {
-                platformPosition.X -= _platformHaste;
+                gameState.Platform.Position.X -= platformHaste;
+
                 if (!_form.gameStarted)
                 {
-                    ballPosition.X -= _platformHaste;
+                    gameState.Ball.Position.X -= platformHaste;
+
                     _form.RefreshMainWindow();
                 }
             }
@@ -296,19 +246,29 @@ namespace Arcanoid
         /// перемещение платформы влево
         /// в начале игры и после потери жизни вместе с платформой двигается шарик
         /// </summary>
-        public void ChangePlatformPositionToRight()
+        public void ChangePlatformPositionToRight(int platformHaste)
         {
-            if (platformPosition.X < 0.9 * mainWindowWidth)
+            if (gameState.Platform.Position.X + platformHaste < virtualWidth - gameState.Platform.Width)
             {
-                platformPosition.X += _platformHaste;
+                gameState.Platform.Position.X += platformHaste;
+
                 if (!_form.gameStarted)
                 {
-                    ballPosition.X += _platformHaste;
+                    gameState.Ball.Position.X += platformHaste;
+
                     _form.RefreshMainWindow();
                 }
             }
         }
 
+        /*
+         * сделать виртуальные координаты
+         * с помощью них вычислять всю логику
+         * поубирать конверты
+         * формула скейла - размер реального окна делить на размер виртуальног окна и умножить на коеффициенты
+         * вычислять перед отрисовкой
+         *
+         */
         //private bool Intersection(Point firstLinePoint1, Point firstLinePoint2, Point SecondLinePoint1, Point SecondLinePoint2)
         //{
         //    //int v1 = vector_mult(p4.X - p3.X, p4.Y - p3.Y, p1.X - p3.X, p1.Y - p3.Y);

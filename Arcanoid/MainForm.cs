@@ -13,20 +13,22 @@ namespace Arcanoid
 {
     public partial class MainForm : Form
     {
-        private Rectangle platform;
-        private RectangleF ball;
         public bool gameStarted;
         public string difficulty;
         private Bitmap backBuffer;
         private Logic logic;
         private List<Rectangle> rectList = new List<Rectangle>();
         private int platformHaste;
+        public bool pause;
+        private PointF scale = new PointF(1, 1);
 
         public MainForm()
         {
             InitializeComponent();
             SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
             UpdateStyles();
+            FormStandartSize();
+            GroupBoxLocation();
 
             DifficultyList();
             OptionsGroupBox.Visible = false;
@@ -39,12 +41,11 @@ namespace Arcanoid
             this.Load += Form1_CreateBackBuffer;
             difficulty = (string)DifficultyComboBox.SelectedItem;
             platformHaste = PlatformHasteTrackBar.Value;
+            MainWindow.Size = new Size() { Height = 300, Width = 203 };
 
-            logic = new Logic(platformHaste, this);
+            logic = new Logic(this);
 
-            ball = new RectangleF(0, 0, 4, 4);
-            platform = new Rectangle(0, 0, 20, 5);
-            logic.MainWindowSize(MainWindow.Height, MainWindow.Width);
+            //logic.MainWindowSize(MainWindow.Height, MainWindow.Width);
         }
 
         private void MainWindow_Paint(object sender, PaintEventArgs e)
@@ -82,13 +83,21 @@ namespace Arcanoid
         /// <summary>
         /// создание блока для отрисовки по вычисленным позициям
         /// </summary>
-        /// <param name="position">позиция блока</param>
-        public void AddBlocksAsRectangles(PointF position)
+
+        public void AddBlocksAsRectangles()
         {
-            var x = Convert.ToInt32(position.X);
-            var y = Convert.ToInt32(position.Y);
-            var rect = new Rectangle(x, y, 20, 10);
-            rectList.Add(rect);
+            foreach (Block block in logic.gameState.Blocks)
+            {
+                if (block.Visible)
+                {
+                    var x = Convert.ToInt32(block.Position.X * scale.X);
+                    var y = Convert.ToInt32(block.Position.Y * scale.Y);
+                    var height = Convert.ToInt32(block.Height * scale.Y);
+                    var width = Convert.ToInt32(block.Width * scale.X);
+                    var rect = new Rectangle(x, y, width, height);
+                    rectList.Add(rect);
+                }
+            }
         }
 
         /// <summary>
@@ -110,14 +119,23 @@ namespace Arcanoid
                 {
                     graph.Clear(Color.White);
                     Pen blackPen = new Pen(Color.FromArgb(255, 0, 0, 0), 1);
-                    var ballPosition = logic.ballPosition;
-                    ball.X = ballPosition.X;
-                    ball.Y = ballPosition.Y;
+                    var ball = new RectangleF
+                    {
+                        X = Convert.ToInt32(logic.gameState.Ball.Position.X * scale.X),
+                        Y = Convert.ToInt32(logic.gameState.Ball.Position.Y * scale.Y),
+                        Height = Convert.ToInt32(logic.gameState.Ball.Diameter * scale.Y),
+                        Width = Convert.ToInt32(logic.gameState.Ball.Diameter * scale.X)
+                    };
                     graph.DrawEllipse(blackPen, ball);
-                    var platformPosition = logic.platformPosition;
-                    platform.X = Convert.ToInt32(platformPosition.X);
-                    platform.Y = Convert.ToInt32(platformPosition.Y);
+                    var platform = new Rectangle()
+                    {
+                        X = Convert.ToInt32(logic.gameState.Platform.Position.X * scale.X),
+                        Y = Convert.ToInt32(logic.gameState.Platform.Position.Y * scale.Y),
+                        Height = Convert.ToInt32(logic.gameState.Platform.Height * scale.Y),
+                        Width = Convert.ToInt32(logic.gameState.Platform.Width * scale.X)
+                    };
                     graph.DrawRectangle(blackPen, platform);
+                    AddBlocksAsRectangles();
                     foreach (Rectangle rect in rectList)
                     {
                         graph.DrawRectangle(blackPen, rect);
@@ -127,9 +145,21 @@ namespace Arcanoid
             }
         }
 
+        private void ScaleSize()
+        {
+            float height = MainWindow.Height;
+            float width = MainWindow.Width;
+            scale.Y = height / logic.virtualHeight;
+            scale.X = width / logic.virtualWidth;
+        }
+
         private void StartGameButton_Click(object sender, EventArgs e)
         {
-            logic.StartGame(difficulty);
+            MaximumSize = new Size()
+            { Height = 0, Width = 0 };
+
+            GameGroupBox.Anchor = (AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top);
+            StartGame();
             MainMenuGroupBox.Visible = false;
             MainMenuGroupBox.Enabled = false;
 
@@ -140,8 +170,16 @@ namespace Arcanoid
             BufferTimer.Enabled = true;
         }
 
+        private void StartGame()
+        {
+            gameStarted = false;
+            logic.gameState.StartPositions();
+            logic.gameState.SwitchDifficulty(difficulty);
+        }
+
         private void SaveChangesButton_Click(object sender, EventArgs e)
         {
+            FormStandartSize();
             platformHaste = PlatformHasteTrackBar.Value;
             difficulty = (string)DifficultyComboBox.SelectedItem;
 
@@ -170,6 +208,7 @@ namespace Arcanoid
 
         private void ReturnButton_Click(object sender, EventArgs e)
         {
+            FormStandartSize();
             OptionsGroupBox.Visible = false;
             OptionsGroupBox.Enabled = false;
 
@@ -184,6 +223,7 @@ namespace Arcanoid
 
         private void OptionsButton_Click(object sender, EventArgs e)
         {
+            FormStandartSize();
             DifficultyComboBox.SelectedItem = difficulty;
             PlatformHasteTrackBar.Value = platformHaste;
 
@@ -204,6 +244,7 @@ namespace Arcanoid
             var result = MessageBox.Show("Потрачено!");
             if (result == DialogResult.OK)
             {
+                FormStandartSize();
                 MainMenuGroupBox.Visible = true;
                 MainMenuGroupBox.Enabled = true;
 
@@ -219,6 +260,7 @@ namespace Arcanoid
 
         private void ToMainMenuButton_Click(object sender, EventArgs e)
         {
+            FormStandartSize();
             RefreshTimer.Enabled = false;
             BufferTimer.Enabled = false;
             gameStarted = false;
@@ -236,29 +278,103 @@ namespace Arcanoid
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Left)
-            {
-                logic.ChangePlatformPositionToLeft();
-            }
-            if (e.KeyCode == Keys.Right)
-            {
-                logic.ChangePlatformPositionToRight();
-            }
+            //if (e.KeyCode == Keys.Left)
+            //{
+            //}
+            //if (e.KeyCode == Keys.Right)
+            //{
+            //}
         }
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
-            {
-                RefreshTimer.Enabled = true;
-                BufferTimer.Enabled = true;
-                gameStarted = true;
-            }
+            //    if (e.KeyCode == Keys.Enter)
+            //    {
+            //    }
         }
 
         private void MainWindow_SizeChanged(object sender, EventArgs e)
         {
-            logic.MainWindowSize(MainWindow.Height, MainWindow.Width);
+            if (MainWindow.Visible)
+            {
+                ScaleSize();
+                //logic.MainWindowSize(MainWindow.Height, MainWindow.Width);
+                //ball.Height = logic.ConvertFloatToInt((float)0.013, MainWindow.Height);
+                //ball.Width = logic.ConvertFloatToInt((float)0.02, MainWindow.Width);
+                //platform.Height = logic.ConvertFloatToInt((float)0.0166, MainWindow.Height);
+                //platform.Width = logic.ConvertFloatToInt((float)0.1, MainWindow.Width);
+
+                //logic.ScalingPositionsOfObjects(MainWindow.Height, MainWindow.Width);
+            }
+        }
+
+        private void PauseButton_Click(object sender, EventArgs e)
+        {
+            pause = true;
+            PauseButton.Enabled = false;
+            PauseButton.Visible = false;
+            ContinueButton.Visible = true;
+            ContinueButton.Enabled = true;
+        }
+
+        private void ContinueButton_Click(object sender, EventArgs e)
+        {
+            pause = false;
+            PauseButton.Enabled = true;
+            PauseButton.Visible = true;
+            ContinueButton.Visible = false;
+            ContinueButton.Enabled = false;
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.Left: // left arrow key
+                    if (!pause)
+                    {
+                        logic.ChangePlatformPositionToLeft(platformHaste);
+                    }
+                    return true;
+
+                case Keys.Right: // right arrow key
+                    if (!pause)
+                    {
+                        logic.ChangePlatformPositionToRight(platformHaste);
+                    }
+                    return true;
+
+                case Keys.Enter:
+                    RefreshTimer.Enabled = true;
+                    BufferTimer.Enabled = true;
+                    gameStarted = true;
+                    return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void FormStandartSize()
+        {
+            Height = 362;
+            Width = 323;
+            var size = new Size();
+            size.Height = 362;
+            size.Width = 323;
+            MinimumSize = size;
+            MaximumSize = size;
+        }
+
+        private void GroupBoxLocation()
+        {
+            var location = new Point()
+            {
+                X = 1,
+                Y = 1
+            };
+
+            MainMenuGroupBox.Location = location;
+            OptionsGroupBox.Location = location;
+            GameGroupBox.Location = location;
         }
     }
 }
