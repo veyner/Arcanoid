@@ -13,6 +13,7 @@ namespace Arcanoid
         public Platform Platform;
         public Ball Ball;
         public int Life;
+        public int invisibleBlocksAtStart = 0;
 
         public GameState()
         {
@@ -97,6 +98,7 @@ namespace Arcanoid
                     else
                     {
                         blocks[i, j].Visible = false;
+                        invisibleBlocksAtStart++;
                     }
                 }
             }

@@ -253,6 +253,22 @@ namespace Arcanoid
             }
         }
 
+        public void WinGame()
+        {
+            RefreshTimer.Enabled = false;
+            BufferTimer.Enabled = false;
+            var result = MessageBox.Show("Выиграно!");
+            if (result == DialogResult.OK)
+            {
+                FormStandartSize();
+                MainMenuGroupBox.Visible = true;
+                MainMenuGroupBox.Enabled = true;
+
+                GameGroupBox.Visible = false;
+                GameGroupBox.Enabled = false;
+            }
+        }
+
         public void ChangeLifeLabel(string life)
         {
             lifeNumberLabel.Text = life;

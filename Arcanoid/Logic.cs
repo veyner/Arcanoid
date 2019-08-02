@@ -25,6 +25,7 @@ namespace Arcanoid
 
         public GameState gameState = new GameState();
         private PointF ballDirect = new PointF(-1, -1);
+        private int invisibleBlock = 0;
 
         public Logic(MainForm form)
         {
@@ -90,10 +91,18 @@ namespace Arcanoid
                     }
                     _form.gameStarted = false;
                     gameState.StartPositions();
+                    ballDirect.X = -1;
+                    ballDirect.Y = -1;
                 }
 
                 _form.ChangeLifeLabel(gameState.Life.ToString());
                 _form.CleanRectangleList();
+                if (gameState.invisibleBlocksAtStart + invisibleBlock == gameState.Blocks.Length)
+                {
+                    _form.WinGame();
+                    invisibleBlock = 0;
+                    gameState.invisibleBlocksAtStart = 0;
+                }
                 //проверка позиции шарика относительно блоков
                 foreach (Block block in gameState.Blocks)
                 {
@@ -105,28 +114,28 @@ namespace Arcanoid
                         {
                             ballDirect.Y *= -1;
                             block.Visible = false;
-
+                            invisibleBlock++;
                             break;
                         }
                         if (point.X <= gameState.Ball.Position.X + gameState.Ball.Diameter / 2 && gameState.Ball.Position.X + gameState.Ball.Diameter / 2 <= point.X + block.Width && gameState.Ball.Position.Y + gameState.Ball.Diameter / 2 == point.Y + block.Height)
                         {
                             ballDirect.Y *= -1;
                             block.Visible = false;
-
+                            invisibleBlock++;
                             break;
                         }
                         if (point.Y <= gameState.Ball.Position.Y + gameState.Ball.Diameter / 2 && gameState.Ball.Position.Y + gameState.Ball.Diameter / 2 <= point.Y + block.Height && gameState.Ball.Position.X + gameState.Ball.Diameter / 2 == point.X)
                         {
                             ballDirect.X *= -1;
                             block.Visible = false;
-
+                            invisibleBlock++;
                             break;
                         }
                         if (point.Y <= gameState.Ball.Position.Y + gameState.Ball.Diameter / 2 && gameState.Ball.Position.Y + gameState.Ball.Diameter / 2 <= point.Y + block.Height && gameState.Ball.Position.X + gameState.Ball.Diameter / 2 == point.X + block.Width)
                         {
                             ballDirect.X *= -1;
                             block.Visible = false;
-
+                            invisibleBlock++;
                             break;
                         }
                         //if (rect.Contains(ball))
@@ -229,7 +238,7 @@ namespace Arcanoid
         /// </summary>
         public void ChangePlatformPositionToLeft(int platformHaste)
         {
-            if (gameState.Platform.Position.X - platformHaste > 0)
+            if (gameState.Platform.Position.X > 0)
             {
                 gameState.Platform.Position.X -= platformHaste;
 
@@ -248,7 +257,7 @@ namespace Arcanoid
         /// </summary>
         public void ChangePlatformPositionToRight(int platformHaste)
         {
-            if (gameState.Platform.Position.X + platformHaste < virtualWidth - gameState.Platform.Width)
+            if (gameState.Platform.Position.X < virtualWidth - gameState.Platform.Width)
             {
                 gameState.Platform.Position.X += platformHaste;
 
