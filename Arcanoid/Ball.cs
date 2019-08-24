@@ -11,5 +11,6 @@ namespace Arcanoid
     {
         public PointF Position;
         public int Diameter { get; set; }
+        public int Texture { get; set; }
     }
 }

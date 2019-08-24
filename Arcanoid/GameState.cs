@@ -20,13 +20,15 @@ namespace Arcanoid
             Ball = new Ball()
             {
                 Position = new PointF(97, 286),
-                Diameter = 4
+                Diameter = 4,
+                Texture = 9
             };
             Platform = new Platform()
             {
-                Position = new PointF(90, 291),
+                Position = new Point(90, 291),
                 Height = 5,
-                Width = 20
+                Width = 20,
+                Texture = 10
             };
             Blocks = new Block[0, 0];
         }
@@ -34,7 +36,7 @@ namespace Arcanoid
         public void StartPositions()
         {
             Ball.Position = new PointF(97, 286);
-            Platform.Position = new PointF(90, 291);
+            Platform.Position = new Point(90, 291);
         }
 
         public void SwitchDifficulty(string currentDifficulty)
@@ -80,6 +82,7 @@ namespace Arcanoid
             {
                 for (int j = 0; j < y; j++)
                 {
+                    var randomTextureNumber = random.Next(1, 8);
                     blocks[i, j] = new Block
                     {
                         Height = 10,
@@ -88,8 +91,10 @@ namespace Arcanoid
                         {
                             X = i * blockWidth,
                             Y = j * blockHeight
-                        }
+                        },
+                        TextureNumber = randomTextureNumber
                     };
+
                     var randomNumber = random.Next(1, 100);
                     if (randomNumber >= 1 && randomNumber <= difficulty)
                     {

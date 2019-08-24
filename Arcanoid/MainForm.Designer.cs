@@ -37,6 +37,8 @@
             this.MainMenuGroupBox = new System.Windows.Forms.GroupBox();
             this.OptionsButton = new System.Windows.Forms.Button();
             this.OptionsGroupBox = new System.Windows.Forms.GroupBox();
+            this.SizeLabel = new System.Windows.Forms.Label();
+            this.SizeComboBox = new System.Windows.Forms.ComboBox();
             this.ReturnButton = new System.Windows.Forms.Button();
             this.SaveChangesButton = new System.Windows.Forms.Button();
             this.MaxHasteLabel = new System.Windows.Forms.Label();
@@ -53,6 +55,7 @@
             this.lifeNumberLabel = new System.Windows.Forms.Label();
             this.ToMainMenuButton = new System.Windows.Forms.Button();
             this.BufferTimer = new System.Windows.Forms.Timer(this.components);
+            this.PlatformTimer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.MainWindow)).BeginInit();
             this.MainMenuGroupBox.SuspendLayout();
             this.OptionsGroupBox.SuspendLayout();
@@ -62,14 +65,12 @@
             // 
             // MainWindow
             // 
-            this.MainWindow.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.MainWindow.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.MainWindow.Enabled = false;
             this.MainWindow.Location = new System.Drawing.Point(6, 14);
             this.MainWindow.Name = "MainWindow";
             this.MainWindow.Size = new System.Drawing.Size(203, 300);
+            this.MainWindow.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.MainWindow.TabIndex = 0;
             this.MainWindow.TabStop = false;
             this.MainWindow.SizeChanged += new System.EventHandler(this.MainWindow_SizeChanged);
@@ -141,6 +142,8 @@
             // OptionsGroupBox
             // 
             this.OptionsGroupBox.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.OptionsGroupBox.Controls.Add(this.SizeLabel);
+            this.OptionsGroupBox.Controls.Add(this.SizeComboBox);
             this.OptionsGroupBox.Controls.Add(this.ReturnButton);
             this.OptionsGroupBox.Controls.Add(this.SaveChangesButton);
             this.OptionsGroupBox.Controls.Add(this.MaxHasteLabel);
@@ -156,9 +159,27 @@
             this.OptionsGroupBox.TabStop = false;
             this.OptionsGroupBox.Text = "Настройки";
             // 
+            // SizeLabel
+            // 
+            this.SizeLabel.AutoSize = true;
+            this.SizeLabel.Location = new System.Drawing.Point(12, 51);
+            this.SizeLabel.Name = "SizeLabel";
+            this.SizeLabel.Size = new System.Drawing.Size(73, 13);
+            this.SizeLabel.TabIndex = 9;
+            this.SizeLabel.Text = "Размер окна";
+            // 
+            // SizeComboBox
+            // 
+            this.SizeComboBox.FormattingEnabled = true;
+            this.SizeComboBox.Location = new System.Drawing.Point(91, 47);
+            this.SizeComboBox.Name = "SizeComboBox";
+            this.SizeComboBox.Size = new System.Drawing.Size(121, 21);
+            this.SizeComboBox.TabIndex = 8;
+            this.SizeComboBox.SelectedIndexChanged += new System.EventHandler(this.SizeComboBox_SelectedIndexChanged);
+            // 
             // ReturnButton
             // 
-            this.ReturnButton.Location = new System.Drawing.Point(12, 143);
+            this.ReturnButton.Location = new System.Drawing.Point(15, 167);
             this.ReturnButton.Name = "ReturnButton";
             this.ReturnButton.Size = new System.Drawing.Size(98, 23);
             this.ReturnButton.TabIndex = 7;
@@ -168,7 +189,7 @@
             // 
             // SaveChangesButton
             // 
-            this.SaveChangesButton.Location = new System.Drawing.Point(12, 114);
+            this.SaveChangesButton.Location = new System.Drawing.Point(15, 138);
             this.SaveChangesButton.Name = "SaveChangesButton";
             this.SaveChangesButton.Size = new System.Drawing.Size(98, 23);
             this.SaveChangesButton.TabIndex = 6;
@@ -179,7 +200,7 @@
             // MaxHasteLabel
             // 
             this.MaxHasteLabel.AutoSize = true;
-            this.MaxHasteLabel.Location = new System.Drawing.Point(174, 95);
+            this.MaxHasteLabel.Location = new System.Drawing.Point(177, 119);
             this.MaxHasteLabel.Name = "MaxHasteLabel";
             this.MaxHasteLabel.Size = new System.Drawing.Size(19, 13);
             this.MaxHasteLabel.TabIndex = 5;
@@ -188,7 +209,7 @@
             // MinHasteLabel
             // 
             this.MinHasteLabel.AutoSize = true;
-            this.MinHasteLabel.Location = new System.Drawing.Point(15, 95);
+            this.MinHasteLabel.Location = new System.Drawing.Point(18, 119);
             this.MinHasteLabel.Name = "MinHasteLabel";
             this.MinHasteLabel.Size = new System.Drawing.Size(13, 13);
             this.MinHasteLabel.TabIndex = 4;
@@ -196,7 +217,7 @@
             // 
             // PlatformHasteTrackBar
             // 
-            this.PlatformHasteTrackBar.Location = new System.Drawing.Point(12, 63);
+            this.PlatformHasteTrackBar.Location = new System.Drawing.Point(15, 87);
             this.PlatformHasteTrackBar.Maximum = 30;
             this.PlatformHasteTrackBar.Minimum = 5;
             this.PlatformHasteTrackBar.Name = "PlatformHasteTrackBar";
@@ -209,7 +230,7 @@
             // PlatformHasteLabel
             // 
             this.PlatformHasteLabel.AutoSize = true;
-            this.PlatformHasteLabel.Location = new System.Drawing.Point(9, 47);
+            this.PlatformHasteLabel.Location = new System.Drawing.Point(12, 71);
             this.PlatformHasteLabel.Name = "PlatformHasteLabel";
             this.PlatformHasteLabel.Size = new System.Drawing.Size(117, 13);
             this.PlatformHasteLabel.TabIndex = 2;
@@ -218,7 +239,7 @@
             // DifficultyLabel
             // 
             this.DifficultyLabel.AutoSize = true;
-            this.DifficultyLabel.Location = new System.Drawing.Point(9, 23);
+            this.DifficultyLabel.Location = new System.Drawing.Point(12, 23);
             this.DifficultyLabel.Name = "DifficultyLabel";
             this.DifficultyLabel.Size = new System.Drawing.Size(63, 13);
             this.DifficultyLabel.TabIndex = 1;
@@ -227,7 +248,7 @@
             // DifficultyComboBox
             // 
             this.DifficultyComboBox.FormattingEnabled = true;
-            this.DifficultyComboBox.Location = new System.Drawing.Point(75, 20);
+            this.DifficultyComboBox.Location = new System.Drawing.Point(91, 20);
             this.DifficultyComboBox.Name = "DifficultyComboBox";
             this.DifficultyComboBox.Size = new System.Drawing.Size(121, 21);
             this.DifficultyComboBox.TabIndex = 0;
@@ -334,6 +355,10 @@
             this.BufferTimer.Interval = 1;
             this.BufferTimer.Tick += new System.EventHandler(this.BufferTimer_Tick);
             // 
+            // PlatformTimer
+            // 
+            this.PlatformTimer.Tick += new System.EventHandler(this.PlatformTimer_Tick);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -342,10 +367,12 @@
             this.Controls.Add(this.MainMenuGroupBox);
             this.Controls.Add(this.OptionsGroupBox);
             this.Controls.Add(this.GameGroupBox);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(323, 362);
             this.Name = "MainForm";
-            this.Text = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "arcaniEd";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
             ((System.ComponentModel.ISupportInitialize)(this.MainWindow)).EndInit();
@@ -386,6 +413,9 @@
         private System.Windows.Forms.Timer BufferTimer;
         private System.Windows.Forms.Button PauseButton;
         private System.Windows.Forms.Button ContinueButton;
+        private System.Windows.Forms.Label SizeLabel;
+        private System.Windows.Forms.ComboBox SizeComboBox;
+        private System.Windows.Forms.Timer PlatformTimer;
     }
 }
 

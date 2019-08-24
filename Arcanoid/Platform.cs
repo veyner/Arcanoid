@@ -9,8 +9,9 @@ namespace Arcanoid
 {
     public class Platform
     {
-        public PointF Position;
+        public Point Position;
         public int Height { get; set; }
         public int Width { get; set; }
+        public int Texture { get; set; }
     }
 }

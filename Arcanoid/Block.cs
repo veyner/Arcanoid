@@ -13,6 +13,7 @@ namespace Arcanoid
         public bool Visible { get; set; }
         public int Height { get; set; }
         public int Width { get; set; }
+        public int TextureNumber { get; set; }
 
         public Block()
         {
