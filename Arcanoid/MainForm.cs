@@ -136,7 +136,7 @@ namespace Arcanoid
             {
                 using (var graph = Graphics.FromImage(backBuffer))
                 {
-                    graph.Clear(Color.White);
+                    graph.Clear(Color.SkyBlue);
                     Pen blackPen1 = new Pen(Color.FromArgb(255, 0, 0, 0), 1);
                     Pen blackPen2 = new Pen(Color.FromArgb(255, 0, 0, 0), 2);
                     var ball = new Rectangle
