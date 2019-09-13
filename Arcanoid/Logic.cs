@@ -26,6 +26,9 @@ namespace Arcanoid
         public GameState gameState = new GameState();
         private PointF ballDirect = new PointF((float)-1, (float)-1);
         private int invisibleBlock = 0;
+        private List<Block> intersectedBlockList = new List<Block>();
+
+        private bool ballOutOfPlatform = true; // отбился ли шарик от платформы
 
         public Logic(MainForm form)
         {
@@ -55,7 +58,7 @@ namespace Arcanoid
         //{
         //    return Convert.ToInt32(i * size);
         //}
-
+        
         /// <summary>
         /// Просчет положения шарика, проверка столкновений шарика и блоков
         /// </summary>
@@ -76,11 +79,11 @@ namespace Arcanoid
                     gameState.Ball.Position.Y += ballDirect.Y;
                 }
                 //проверка пересечения рамок окна
-                if (gameState.Ball.Position.X <= 0 || gameState.Ball.Position.X + 4 >= virtualWidth)
+                if (gameState.Ball.Position.X <= 0 || gameState.Ball.Position.X + gameState.Ball.Diameter >= virtualWidth)
                 {
                     ballDirect.X *= -1;
                 }
-                if (gameState.Ball.Position.Y <= 0 || gameState.Ball.Position.Y + 4 >= virtualHeight)
+                if (gameState.Ball.Position.Y <= 0 || gameState.Ball.Position.Y + gameState.Ball.Diameter >= virtualHeight)
                 {
                     ballDirect.Y *= -1;
                 }
@@ -91,107 +94,99 @@ namespace Arcanoid
                 //}
                 var platform = new Rectangle()
                 {
-                    X = gameState.Platform.Position.X,
-                    Y = gameState.Platform.Position.Y,
-                    Height = gameState.Platform.Height,
-                    Width = gameState.Platform.Width
+                    X = gameState.Platform.Position.X-2,
+                    Y = gameState.Platform.Position.Y-2,
+                    Height = gameState.Platform.Height+2,
+                    Width = gameState.Platform.Width+2
                 };
+                if (!ballOutOfPlatform)
+                {
+                    if (ball.IntersectsWith(platform) && ball.Y + gameState.Ball.Diameter / 2 < platform.Y + platform.Height)
+                    {
+                        ballOutOfPlatform = true;
+                        //вычисление внутренних углов платформы образованные диагоналями
+                        var c = Math.Sqrt(Math.Pow(platform.Height, 2) + Math.Pow(platform.Width, 2));
+                        var sin = (platform.Height / c);
+                        var angleA = Math.Asin(sin) * (180 / Math.PI);
+                        var horizonAngle = angleA * 2;
+                        var verticalAngle = 180 - horizonAngle;
 
-                var rect1 = new Rectangle()
-                {
-                    X = platform.X,
-                    Y = platform.Y,
-                    Height = platform.Height,
-                    Width = platform.Width / 5
-                };
-                var rect2 = new Rectangle()
-                {
-                    X = platform.X + 4,
-                    Y = platform.Y,
-                    Height = platform.Height,
-                    Width = platform.Width / 5
-                };
-                var rect3 = new Rectangle()
-                {
-                    X = platform.X + 8,
-                    Y = platform.Y,
-                    Height = platform.Height,
-                    Width = platform.Width / 5
-                };
-                var rect4 = new Rectangle()
-                {
-                    X = platform.X + 12,
-                    Y = platform.Y,
-                    Height = platform.Height,
-                    Width = platform.Width / 5
-                };
-                var rect5 = new Rectangle()
-                {
-                    X = platform.X + 16,
-                    Y = platform.Y,
-                    Height = platform.Height,
-                    Width = platform.Width / 5
-                };
+                        //градус каждого угла платформы
+                        var topleft = horizonAngle / 2;
+                        var topright = topleft + verticalAngle;
+                        var botRight = topright + horizonAngle;
+                        var botLeft = botRight + verticalAngle;
 
-                if (ball.IntersectsWith(rect1))
-                {
-                    if (ballDirect.X < 0)
-                    {
-                        ballDirect.X = (float)-1.7;
+                        float x1 = ball.X + gameState.Ball.Diameter / 2;
+                        float y1 = ball.Y + gameState.Ball.Diameter / 2;
+                        float x2 = platform.X + (platform.Width / 2);
+                        float y2 = platform.Y + (platform.Height / 2);
+                        //вычисление угла под которым шарик прилетает в платформу
+                        float ballAngle = (float)(Math.Atan2(y1 - y2, x1 - x2) / Math.PI * 180);
+                        ballAngle = (ballAngle < 0) ? ballAngle + 360 : ballAngle;
+                        if (y2 > y1)
+                        {
+                            ballAngle -= 180;
+                        }
+                        else
+                        {
+                            ballAngle += 180;
+                        }
+                        var platformPartAngle = verticalAngle / 5;
+                        //разделение платформы на 5 частей
+                        var platformAngle1 = topleft + platformPartAngle;
+                        var platformAngle2 = platformAngle1 + platformPartAngle;
+                        var platformAngle3 = platformAngle2 + platformPartAngle;
+                        var platformAngle4 = platformAngle3 + platformPartAngle;
+                        //у каждой части свой угол отбивания шарика
+                        if (topleft < ballAngle && ballAngle < platformAngle1 || platformAngle4 < ballAngle && ballAngle < topright)
+                        {
+                            if (ballDirect.X < 0)
+                            {
+                                ballDirect.X = (float)-1.7;
+                            }
+                            else
+                            {
+                                ballDirect.X = (float)1.7;
+                            }
+                            ballDirect.Y = (float)-0.3;
+                        }
+                        else if (platformAngle1 < ballAngle && ballAngle < platformAngle2 || platformAngle3 < ballAngle && ballAngle < platformAngle4)
+                        {
+                            if (ballDirect.X < 0)
+                            {
+                                ballDirect.X = (float)-1.4;
+                            }
+                            else
+                            {
+                                ballDirect.X = (float)1.4;
+                            }
+                            ballDirect.Y = (float)-0.6;
+                        }
+                        else if (platformAngle2 < ballAngle && ballAngle < platformAngle3)
+                        {
+                            if (ballDirect.X < 0)
+                            {
+                                ballDirect.X = (float)-1;
+                            }
+                            else
+                            {
+                                ballDirect.X = (float)1;
+                            }
+                            ballDirect.Y = (float)-1;
+                        }
+                        //если шарик прилетает в боковую сторону платформы, он меняет направление на обратное
+                        if(0<ballAngle && ballAngle<topleft || ballAngle<360 && botLeft<ballAngle)
+                        {
+                            ballDirect.X *= -1;
+                            ballDirect.Y *= -1;
+                        }
+                        else if(topright<ballAngle && ballAngle<botRight)
+                        {
+                            ballDirect.X *= -1;
+                            ballDirect.Y *= -1;
+                        }
                     }
-                    else
-                    {
-                        ballDirect.X = (float)1.7;
-                    }
-                    ballDirect.Y = (float)-0.3;
-                }
-                if (ball.IntersectsWith(rect2))
-                {
-                    if (ballDirect.X < 0)
-                    {
-                        ballDirect.X = (float)-1.4;
-                    }
-                    else
-                    {
-                        ballDirect.X = (float)1.4;
-                    }
-                    ballDirect.Y = (float)-0.6;
-                }
-                if (ball.IntersectsWith(rect3))
-                {
-                    if (ballDirect.X < 0)
-                    {
-                        ballDirect.X = (float)-1;
-                    }
-                    else
-                    {
-                        ballDirect.X = (float)1;
-                    }
-                    ballDirect.Y = (float)-1;
-                }
-                if (ball.IntersectsWith(rect4))
-                {
-                    if (ballDirect.X < 0)
-                    {
-                        ballDirect.X = (float)-1.4;
-                    }
-                    else
-                    {
-                        ballDirect.X = (float)1.4;
-                    }
-                    ballDirect.Y = (float)-0.6;
-                }
-                if (ball.IntersectsWith(rect5))
-                {
-                    if (ballDirect.X < 0)
-                    {
-                        ballDirect.X = (float)-1.7;
-                    }
-                    else
-                    {
-                        ballDirect.X = (float)1.7;
-                    }
-                    ballDirect.Y = (float)-0.3;
                 }
 
                 if (gameState.Ball.Position.Y + gameState.Ball.Diameter >= virtualHeight)
@@ -200,15 +195,63 @@ namespace Arcanoid
                     if (gameState.Life == 0)
                     {
                         _form.EndGame();
+                        invisibleBlock = 0;
+                        gameState.invisibleBlocksAtStart = 0;
                     }
                     _form.gameStarted = false;
                     gameState.StartPositions();
                     ballDirect.X = -1;
                     ballDirect.Y = -1;
+                    ballOutOfPlatform = true;
                 }
 
                 _form.ChangeLifeLabel(gameState.Life.ToString());
                 _form.CleanRectangleList();
+                //проверка - сколько блоков зацепил шарик
+                foreach (Block block in gameState.Blocks)
+                {
+                    if (block.Visible)
+                    {
+                        var x = Convert.ToInt32(block.Position.X);
+                        var y = Convert.ToInt32(block.Position.Y);
+                        var height = Convert.ToInt32(block.Height);
+                        var width = Convert.ToInt32(block.Width);
+                        var rect = new Rectangle(x, y, width, height);
+                        if (ball.IntersectsWith(rect))
+                        {
+                            intersectedBlockList.Add(block);
+                        }
+                    }
+                }
+                if(intersectedBlockList.Count == 1)
+                {
+                    DeleteBlock(intersectedBlockList[0],ball);
+                    intersectedBlockList.Clear();
+                    ballOutOfPlatform = false;
+                }
+                else if(intersectedBlockList.Count == 2)
+                {
+                    var block1 = intersectedBlockList[0];
+                    var block2 = intersectedBlockList[1];
+
+                    if(block1.Position.X == block2.Position.X)
+                    {
+                        ballDirect.X *= -1;
+                        block1.Visible = false;
+                        block2.Visible = false;
+                        invisibleBlock += 2;
+                    }
+                    else if(block1.Position.Y == block2.Position.Y)
+                    {
+                        ballDirect.Y *= -1;
+                        block1.Visible = false;
+                        block2.Visible = false;
+                        invisibleBlock += 2;
+                    }
+                    intersectedBlockList.Clear();
+                    ballOutOfPlatform = false;
+                }
+                // остаток блоков - если все блоки выбиты - игра завершается
                 if (gameState.invisibleBlocksAtStart + invisibleBlock == gameState.Blocks.Length)
                 {
                     _form.WinGame();
@@ -216,6 +259,7 @@ namespace Arcanoid
                     gameState.invisibleBlocksAtStart = 0;
                 }
                 //проверка позиции шарика относительно блоков
+                /*
                 foreach (Block block in gameState.Blocks)
                 {
                     if (block.Visible)
@@ -228,63 +272,8 @@ namespace Arcanoid
 
                         if (ball.IntersectsWith(rect))
                         {
-                            var c = Math.Sqrt(Math.Pow(block.Height, 2) + Math.Pow(block.Width, 2));
-                            var sin = (block.Height / c);
-                            var angleA = Math.Asin(sin) * (180 / Math.PI);
-                            var horizonAngle = angleA * 2;
-                            var verticalAngle = 180 - horizonAngle;
-
-                            var topleft = horizonAngle / 2;
-                            var topright = topleft + verticalAngle;
-                            var botRight = topright + horizonAngle;
-                            var botLeft = botRight + verticalAngle;
-
-                            float x1 = ball.X;
-                            float y1 = ball.Y;
-                            float x2 = block.Position.X + (block.Width / 2);
-                            float y2 = block.Position.Y + (block.Height / 2);
-                            float ballAngle = (float)(Math.Atan2(y1 - y2, x1 - x2) / Math.PI * 180);
-                            ballAngle = (ballAngle < 0) ? ballAngle + 360 : ballAngle;
-                            if (y1 > y2)
-                            {
-                                ballAngle += 180;
-                            }
-                            if (ballAngle == topleft || ballAngle == topright || ballAngle == botLeft || ballAngle == botRight)
-                            {
-                                ballDirect.X *= -1;
-                                ballDirect.Y *= -1;
-                                block.Visible = false;
-                                invisibleBlock++;
-                                break;
-                            }
-                            if (0 <= ballAngle && ballAngle < topleft || botLeft < ballAngle && ballAngle <= 360)
-                            {
-                                ballDirect.X *= -1;
-                                block.Visible = false;
-                                invisibleBlock++;
-                                break;
-                            }
-                            if (topleft < ballAngle && ballAngle < topright)
-                            {
-                                ballDirect.Y *= -1;
-                                block.Visible = false;
-                                invisibleBlock++;
-                                break;
-                            }
-                            if (topright < ballAngle && ballAngle < botRight)
-                            {
-                                ballDirect.X *= -1;
-                                block.Visible = false;
-                                invisibleBlock++;
-                                break;
-                            }
-                            if (botRight < ballAngle && ballAngle < botLeft)
-                            {
-                                ballDirect.Y *= -1;
-                                block.Visible = false;
-                                invisibleBlock++;
-                                break;
-                            }
+                            DeleteBlock(block,ball);
+                            
                             //if ((rect.Bottom - ball.Top) <= 1)
                             //{
                             //    ballDirect.Y *= -1;
@@ -415,8 +404,169 @@ namespace Arcanoid
                         //    }
                         //}
                     }
+                }*/
+            }
+        }
+        /// <summary>
+        /// проверка позиции шарика относительно блоков и удаление блока если коснулся шарик
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="ball"></param>
+        private void DeleteBlock(Block block, Rectangle ball)
+        {
+            var c = Math.Sqrt(Math.Pow(block.Height, 2) + Math.Pow(block.Width, 2));
+            var sin = (block.Height / c);
+            var angleA = Math.Asin(sin) * (180 / Math.PI);
+            var horizonAngle = angleA * 2;
+            var verticalAngle = 180 - horizonAngle;
+
+            var topleft = horizonAngle / 2;
+            var topright = topleft + verticalAngle;
+            var botRight = topright + horizonAngle;
+            var botLeft = botRight + verticalAngle;
+
+            float x1 = ball.X + gameState.Ball.Diameter / 2;
+            float y1 = ball.Y + gameState.Ball.Diameter / 2;
+            float x2 = block.Position.X + (block.Width / 2);
+            float y2 = block.Position.Y + (block.Height / 2);
+
+            var tanY = y1 - y2;
+            var tanX = x1 - x2;
+            float ballAngle = (float)(Math.Atan2(tanY, tanX) / Math.PI * 180);
+            ballAngle = (ballAngle < 0) ? ballAngle + 180 : ballAngle;
+            //if (y1 > y2)
+            //{
+            //    ballAngle += 180;
+            //}
+            //else
+            //{
+            //    ballAngle -= 180;
+            //}
+
+
+
+            //if (ballDirect.Y > 0 && y1 <= y2)
+            //{
+            //    ballAngle -= 180;
+            //}
+            //else if (ballDirect.Y < 0 && y1>=y2)
+            //{
+            //    ballAngle += 180;
+            //}
+            //else if (y1 > y2)
+            //{
+            //    ballAngle += 180;
+            //}
+            //else if(y1<y2)
+            //{
+            //    ballAngle -= 180;
+            //}
+
+            /*
+            if (ballAngle == topleft || ballAngle == topright || ballAngle == botLeft || ballAngle == botRight)
+            {
+                ballDirect.X *= -1;
+                ballDirect.Y *= -1;
+                block.Visible = false;
+                invisibleBlock++;
+                break;
+            }
+            */
+            /*
+            if(ballDirect.X<0 && ballDirect.Y<0)
+            {
+                if (botRight < ballAngle && ballAngle <= botLeft)
+                {
+                ballDirect.Y *= -1;
+                block.Visible = false;
+                invisibleBlock++;
+                }
+                else if (topright <= ballAngle && ballAngle < botRight)
+                {
+                ballDirect.X *= -1;
+                block.Visible = false;
+                invisibleBlock++;
                 }
             }
+            else if(ballDirect.X>0 && ballDirect.Y>0)
+            {
+                if (0 <= ballAngle && ballAngle < topleft || botLeft <= ballAngle && ballAngle <= 360)
+                {
+                ballDirect.X *= -1;
+                block.Visible = false;
+                invisibleBlock++;
+                }
+                else if (topleft < ballAngle && ballAngle <= topright)
+                {
+                ballDirect.Y *= -1;
+                block.Visible = false;
+                invisibleBlock++;
+                }
+
+            }
+            else if(ballDirect.X<0 && ballDirect.Y>0)
+            {
+                if (topleft <= ballAngle && ballAngle < topright)
+                {
+                ballDirect.Y *= -1;
+                block.Visible = false;
+                invisibleBlock++;
+                }
+                else if (topright < ballAngle && ballAngle <= botRight)
+                {
+                ballDirect.X *= -1;
+                block.Visible = false;
+                invisibleBlock++;
+                }
+            }
+            else if(ballDirect.X>0 && ballDirect.Y<0)
+            {
+                if (botRight <= ballAngle && ballAngle < botLeft)
+                {
+                ballDirect.Y *= -1;
+                block.Visible = false;
+                invisibleBlock++;
+                }
+                else if (0 <= ballAngle && ballAngle <= topleft || botLeft < ballAngle && ballAngle <= 360)
+                {
+                ballDirect.X *= -1;
+                block.Visible = false;
+                invisibleBlock++;
+                }
+            }*/
+
+            if (0 <= ballAngle && ballAngle < topleft || botLeft < ballAngle && ballAngle <= 360)
+            {
+                ballDirect.X *= -1;
+                block.Visible = false;
+                invisibleBlock++;
+            }
+            else if (topleft < ballAngle && ballAngle < topright)
+            {
+                ballDirect.Y *= -1;
+                block.Visible = false;
+                invisibleBlock++;
+            }
+            else if (topright < ballAngle && ballAngle < botRight)
+            {
+                ballDirect.X *= -1;
+                block.Visible = false;
+                invisibleBlock++;
+            }
+            else if (botRight < ballAngle && ballAngle < botLeft)
+            {
+                ballDirect.Y *= -1;
+                block.Visible = false;
+                invisibleBlock++;
+            }
+            
+        }
+        /// <summary>
+        /// первоначальное направление шарика
+        /// </summary>
+        public void StartDirection()
+        {
+            ballDirect = new PointF((float)-1, (float)-1);
         }
 
         //private void ScalingBlockPositions(int height, int width)
@@ -477,14 +627,6 @@ namespace Arcanoid
             }
         }
 
-        /*
-         * сделать виртуальные координаты
-         * с помощью них вычислять всю логику
-         * поубирать конверты
-         * формула скейла - размер реального окна делить на размер виртуальног окна и умножить на коеффициенты
-         * вычислять перед отрисовкой
-         *
-         */
         //private bool Intersection(Point firstLinePoint1, Point firstLinePoint2, Point SecondLinePoint1, Point SecondLinePoint2)
         //{
         //    //int v1 = vector_mult(p4.X - p3.X, p4.Y - p3.Y, p1.X - p3.X, p1.Y - p3.Y);

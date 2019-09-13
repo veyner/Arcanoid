@@ -48,7 +48,6 @@
             this.DifficultyLabel = new System.Windows.Forms.Label();
             this.DifficultyComboBox = new System.Windows.Forms.ComboBox();
             this.GameGroupBox = new System.Windows.Forms.GroupBox();
-            this.ContinueButton = new System.Windows.Forms.Button();
             this.PauseButton = new System.Windows.Forms.Button();
             this.LifeLabel = new System.Windows.Forms.Label();
             this.Life2Label = new System.Windows.Forms.Label();
@@ -78,7 +77,7 @@
             // 
             // RefreshTimer
             // 
-            this.RefreshTimer.Interval = 10;
+            this.RefreshTimer.Interval = 15;
             this.RefreshTimer.Tick += new System.EventHandler(this.RefreshTimer_Tick);
             // 
             // StartGameButton
@@ -256,36 +255,18 @@
             // GameGroupBox
             // 
             this.GameGroupBox.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.GameGroupBox.Controls.Add(this.ContinueButton);
             this.GameGroupBox.Controls.Add(this.PauseButton);
             this.GameGroupBox.Controls.Add(this.LifeLabel);
             this.GameGroupBox.Controls.Add(this.Life2Label);
             this.GameGroupBox.Controls.Add(this.lifeNumberLabel);
             this.GameGroupBox.Controls.Add(this.ToMainMenuButton);
             this.GameGroupBox.Controls.Add(this.MainWindow);
-            this.GameGroupBox.Enabled = false;
             this.GameGroupBox.Location = new System.Drawing.Point(10, 0);
             this.GameGroupBox.Name = "GameGroupBox";
             this.GameGroupBox.Size = new System.Drawing.Size(300, 320);
             this.GameGroupBox.TabIndex = 14;
             this.GameGroupBox.TabStop = false;
             this.GameGroupBox.Visible = false;
-            // 
-            // ContinueButton
-            // 
-            this.ContinueButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ContinueButton.Enabled = false;
-            this.ContinueButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.7F);
-            this.ContinueButton.Location = new System.Drawing.Point(212, 229);
-            this.ContinueButton.Margin = new System.Windows.Forms.Padding(0);
-            this.ContinueButton.Name = "ContinueButton";
-            this.ContinueButton.Size = new System.Drawing.Size(83, 39);
-            this.ContinueButton.TabIndex = 19;
-            this.ContinueButton.TabStop = false;
-            this.ContinueButton.Text = "Продолжить";
-            this.ContinueButton.UseVisualStyleBackColor = true;
-            this.ContinueButton.Visible = false;
-            this.ContinueButton.Click += new System.EventHandler(this.ContinueButton_Click);
             // 
             // PauseButton
             // 
@@ -352,11 +333,12 @@
             // 
             // BufferTimer
             // 
-            this.BufferTimer.Interval = 1;
+            this.BufferTimer.Interval = 15;
             this.BufferTimer.Tick += new System.EventHandler(this.BufferTimer_Tick);
             // 
             // PlatformTimer
             // 
+            this.PlatformTimer.Interval = 20;
             this.PlatformTimer.Tick += new System.EventHandler(this.PlatformTimer_Tick);
             // 
             // MainForm
@@ -373,8 +355,6 @@
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "arcaniEd";
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
             ((System.ComponentModel.ISupportInitialize)(this.MainWindow)).EndInit();
             this.MainMenuGroupBox.ResumeLayout(false);
             this.MainMenuGroupBox.PerformLayout();
@@ -412,7 +392,6 @@
         private System.Windows.Forms.Button ToMainMenuButton;
         private System.Windows.Forms.Timer BufferTimer;
         private System.Windows.Forms.Button PauseButton;
-        private System.Windows.Forms.Button ContinueButton;
         private System.Windows.Forms.Label SizeLabel;
         private System.Windows.Forms.ComboBox SizeComboBox;
         private System.Windows.Forms.Timer PlatformTimer;
