@@ -347,6 +347,7 @@ namespace Arcanoid
             StartGame();
             textureList.Clear();
             AddBlockTextureList();
+            
 
             PauseButton.Text = "Пауза"; 
 
