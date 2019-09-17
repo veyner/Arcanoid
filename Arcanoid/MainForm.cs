@@ -28,7 +28,6 @@ namespace Arcanoid
         private string textureDir = "Textures";
 
         private string textureImage = "TexturePack.png";
-        //private string ballTextureImage = "BallTexture.png";
         private List<Texture> textureList = new List<Texture>();
 
         public MainForm()
@@ -37,7 +36,6 @@ namespace Arcanoid
             SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
 
             UpdateStyles();
-            //FormStandartSize();
             Height = 362;
             Width = 323;
             GroupBoxLocation();
@@ -45,18 +43,14 @@ namespace Arcanoid
             DifficultyList();
             SizeList();
             OptionsGroupBox.Visible = false;
-            //OptionsGroupBox.Enabled = false;
 
             MainMenuGroupBox.Visible = true;
-            //MainMenuGroupBox.Enabled = true;
 
             this.ResizeEnd += Form1_CreateBackBuffer;
             this.Load += Form1_CreateBackBuffer;
             difficulty = (string)DifficultyComboBox.SelectedItem;
             platformHaste = PlatformHasteTrackBar.Value;
-            //MainWindow.Size = new Size() { Height = 300, Width = 203 };
             logic = new Logic(this);
-            //logic.MainWindowSize(MainWindow.Height, MainWindow.Width);
         }
         //отрисовка из буфера в окно
         private void MainWindow_Paint(object sender, PaintEventArgs e)
@@ -149,8 +143,7 @@ namespace Arcanoid
                     };
                     graph.DrawEllipse(blackPen1, ball);
                     graph.FillEllipse(Brushes.Orange, ball);
-                    //var ballTexture = logic.gameState.Ball.Texture;
-                    //graph.FillRectangle(textureList[ballTexture - 1].TextureBrush, ball);
+                    
                     var platform = new Rectangle()
                     {
                         X = Convert.ToInt32(logic.gameState.Platform.Position.X * scale.X),
@@ -160,8 +153,7 @@ namespace Arcanoid
                     };
                     graph.DrawRectangle(blackPen2, platform);
                     graph.FillRectangle(Brushes.Red, platform);
-                    //var platformTexture = logic.gameState.Platform.Texture;
-                    //graph.FillRectangle(textureList[platformTexture - 1].TextureBrush, platform);
+                    
                     DrawBlockAsRectangles(graph);
                     Invalidate();
                 }
@@ -263,32 +255,6 @@ namespace Arcanoid
             var textureRect8 = new Rectangle(texture8.X, texture8.Y, texture8.Width, texture8.Height);
             texture8.TextureBrush = GetTextureBrush(textureRect8, rect.Width, rect.Height, textureImage);
             textureList.Add(texture8);
-            //var ballHeight = Convert.ToInt32(logic.gameState.Ball.Diameter * scale.Y);
-            //var ballWidth = Convert.ToInt32(logic.gameState.Ball.Diameter * scale.X);
-            //var ballTexture = new Texture()
-            //{
-            //    X = 0,
-            //    Y = 0,
-            //    Width = 24,
-            //    Height = 24,
-            //    Number = 9
-            //};
-            //var ballTextureRect = new Rectangle(ballTexture.X, ballTexture.Y, ballTexture.Width, ballTexture.Height);
-            //ballTexture.TextureBrush = GetTextureBrush(ballTextureRect, ballWidth, ballHeight, ballTextureImage);
-            //textureList.Add(ballTexture);
-            //var platformHeight = Convert.ToInt32(logic.gameState.Platform.Height * scale.Y);
-            //var platformWidth = Convert.ToInt32(logic.gameState.Platform.Width * scale.X);
-            //var platformTexture = new Texture()
-            //{
-            //    X = 152,
-            //    Y = 80,
-            //    Width = 128,
-            //    Height = 24,
-            //    Number = 10
-            //};
-            //var platformTextureRect = new Rectangle(platformTexture.X, platformTexture.Y, platformTexture.Width, platformTexture.Height);
-            //platformTexture.TextureBrush = GetTextureBrush(platformTextureRect, platformWidth, platformHeight, textureImage);
-            //textureList.Add(platformTexture);
         }
         /// <summary>
         /// обрезка текстуры блока
@@ -338,9 +304,6 @@ namespace Arcanoid
 
         private void StartGameButton_Click(object sender, EventArgs e)
         {
-            //MaximumSize = new Size()
-            //{ Height = 0, Width = 0 };
-
             GameGroupBox.Anchor = (AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top);
             SelectSize();
             ScaleSize();
@@ -348,14 +311,11 @@ namespace Arcanoid
             textureList.Clear();
             AddBlockTextureList();
             
-
             PauseButton.Text = "Пауза"; 
 
             MainMenuGroupBox.Visible = false;
-            //MainMenuGroupBox.Enabled = false;
 
             GameGroupBox.Visible = true;
-            //GameGroupBox.Enabled = true;
 
             RefreshTimer.Enabled = true;
             BufferTimer.Enabled = true;
@@ -367,6 +327,7 @@ namespace Arcanoid
         private void StartGame()
         {
             gameStarted = false;
+            logic.CleanInvisibleBlockList();
             logic.gameState.StartPositions();
             logic.gameState.SwitchDifficulty(difficulty);
             logic.StartDirection();
@@ -374,15 +335,12 @@ namespace Arcanoid
 
         private void SaveChangesButton_Click(object sender, EventArgs e)
         {
-            //FormStandartSize();
             platformHaste = PlatformHasteTrackBar.Value;
             difficulty = (string)DifficultyComboBox.SelectedItem;
 
             OptionsGroupBox.Visible = false;
-            //OptionsGroupBox.Enabled = false;
 
             MainMenuGroupBox.Visible = true;
-            //MainMenuGroupBox.Enabled = true;
         }
 
         /// <summary>
@@ -417,12 +375,9 @@ namespace Arcanoid
 
         private void ReturnButton_Click(object sender, EventArgs e)
         {
-            //FormStandartSize();
             OptionsGroupBox.Visible = false;
-            //OptionsGroupBox.Enabled = false;
 
             MainMenuGroupBox.Visible = true;
-            //MainMenuGroupBox.Enabled = true;
         }
 
         private void ExitButton_Click(object sender, EventArgs e)
@@ -432,15 +387,12 @@ namespace Arcanoid
 
         private void OptionsButton_Click(object sender, EventArgs e)
         {
-            //FormStandartSize();
             DifficultyComboBox.SelectedItem = difficulty;
             PlatformHasteTrackBar.Value = platformHaste;
 
             OptionsGroupBox.Visible = true;
-            //OptionsGroupBox.Enabled = true;
 
             MainMenuGroupBox.Visible = false;
-            //MainMenuGroupBox.Enabled = false;
         }
 
         /// <summary>
@@ -450,15 +402,14 @@ namespace Arcanoid
         {
             RefreshTimer.Enabled = false;
             BufferTimer.Enabled = false;
+            PlatformTimer.Enabled = false;
             var result = MessageBox.Show("Потрачено!");
             if (result == DialogResult.OK)
             {
                 FormStandartSize();
                 MainMenuGroupBox.Visible = true;
-                //MainMenuGroupBox.Enabled = true;
                 gameStarted = false;
                 GameGroupBox.Visible = false;
-                //GameGroupBox.Enabled = false;
             }
         }
         /// <summary>
@@ -468,15 +419,14 @@ namespace Arcanoid
         {
             RefreshTimer.Enabled = false;
             BufferTimer.Enabled = false;
+            PlatformTimer.Enabled = false;
             var result = MessageBox.Show("Выиграно!");
             if (result == DialogResult.OK)
             {
                 FormStandartSize();
                 MainMenuGroupBox.Visible = true;
-                //MainMenuGroupBox.Enabled = true;
                 gameStarted = false;
                 GameGroupBox.Visible = false;
-                //GameGroupBox.Enabled = false;
             }
         }
         /// <summary>
@@ -493,32 +443,16 @@ namespace Arcanoid
             FormStandartSize();
             RefreshTimer.Enabled = false;
             BufferTimer.Enabled = false;
+            PlatformTimer.Enabled = false;
             gameStarted = false;
             MainMenuGroupBox.Visible = true;
-            //MainMenuGroupBox.Enabled = true;
             pause = false;
             GameGroupBox.Visible = false;
-            //GameGroupBox.Enabled = false;
         }
 
         public void RefreshMainWindow()
         {
             MainWindow.Refresh();
-        }
-
-        private void MainWindow_SizeChanged(object sender, EventArgs e)
-        {
-            if (MainWindow.Visible)
-            {
-                //ScaleSize();
-                //logic.MainWindowSize(MainWindow.Height, MainWindow.Width);
-                //ball.Height = logic.ConvertFloatToInt((float)0.013, MainWindow.Height);
-                //ball.Width = logic.ConvertFloatToInt((float)0.02, MainWindow.Width);
-                //platform.Height = logic.ConvertFloatToInt((float)0.0166, MainWindow.Height);
-                //platform.Width = logic.ConvertFloatToInt((float)0.1, MainWindow.Width);
-
-                //logic.ScalingPositionsOfObjects(MainWindow.Height, MainWindow.Width);
-            }
         }
 
         private void PauseButton_Click(object sender, EventArgs e)
@@ -576,9 +510,12 @@ namespace Arcanoid
                     return true;
 
                 case Keys.Enter:
-                    RefreshTimer.Enabled = true;
-                    BufferTimer.Enabled = true;
-                    gameStarted = true;
+                    if(GameGroupBox.Visible)
+                    {
+                        RefreshTimer.Enabled = true;
+                        BufferTimer.Enabled = true;
+                        gameStarted = true;
+                    }
                     return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
@@ -593,8 +530,6 @@ namespace Arcanoid
             var size = new Size();
             size.Height = 362;
             size.Width = 323;
-            //MinimumSize = size;
-            //MaximumSize = size;
         }
         /// <summary>
         /// установка всех groupbox по заданным координатам
@@ -639,10 +574,6 @@ namespace Arcanoid
             backBuffer = new Bitmap(MainWindow.Width, MainWindow.Height);
         }
 
-        private void SizeComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
-
         private void PlatformTimer_Tick(object sender, EventArgs e)
         {
             if (leftArrow)
@@ -658,6 +589,15 @@ namespace Arcanoid
                 {
                     logic.ChangePlatformPositionToRight(platformHaste);
                 }
+            }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var exitResult = MessageBox.Show("Вы хотите закрыть приложение?","Выход",MessageBoxButtons.YesNo);
+            if (exitResult == DialogResult.No)
+            {
+                e.Cancel = true;
             }
         }
     }

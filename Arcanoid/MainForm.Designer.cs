@@ -72,7 +72,6 @@
             this.MainWindow.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.MainWindow.TabIndex = 0;
             this.MainWindow.TabStop = false;
-            this.MainWindow.SizeChanged += new System.EventHandler(this.MainWindow_SizeChanged);
             this.MainWindow.Paint += new System.Windows.Forms.PaintEventHandler(this.MainWindow_Paint);
             // 
             // RefreshTimer
@@ -174,7 +173,6 @@
             this.SizeComboBox.Name = "SizeComboBox";
             this.SizeComboBox.Size = new System.Drawing.Size(121, 21);
             this.SizeComboBox.TabIndex = 8;
-            this.SizeComboBox.SelectedIndexChanged += new System.EventHandler(this.SizeComboBox_SelectedIndexChanged);
             // 
             // ReturnButton
             // 
@@ -355,6 +353,7 @@
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "arcaniEd";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.MainWindow)).EndInit();
             this.MainMenuGroupBox.ResumeLayout(false);
             this.MainMenuGroupBox.PerformLayout();
