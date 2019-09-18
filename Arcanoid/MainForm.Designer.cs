@@ -53,7 +53,6 @@
             this.Life2Label = new System.Windows.Forms.Label();
             this.lifeNumberLabel = new System.Windows.Forms.Label();
             this.ToMainMenuButton = new System.Windows.Forms.Button();
-            this.BufferTimer = new System.Windows.Forms.Timer(this.components);
             this.PlatformTimer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.MainWindow)).BeginInit();
             this.MainMenuGroupBox.SuspendLayout();
@@ -329,11 +328,6 @@
             this.ToMainMenuButton.UseVisualStyleBackColor = true;
             this.ToMainMenuButton.Click += new System.EventHandler(this.ToMainMenuButton_Click);
             // 
-            // BufferTimer
-            // 
-            this.BufferTimer.Interval = 15;
-            this.BufferTimer.Tick += new System.EventHandler(this.BufferTimer_Tick);
-            // 
             // PlatformTimer
             // 
             this.PlatformTimer.Interval = 20;
@@ -352,7 +346,7 @@
             this.MinimumSize = new System.Drawing.Size(323, 362);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "arcaniEd";
+            this.Text = "arcanoEd";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.MainWindow)).EndInit();
             this.MainMenuGroupBox.ResumeLayout(false);
@@ -389,7 +383,6 @@
         private System.Windows.Forms.Label Life2Label;
         private System.Windows.Forms.Label lifeNumberLabel;
         private System.Windows.Forms.Button ToMainMenuButton;
-        private System.Windows.Forms.Timer BufferTimer;
         private System.Windows.Forms.Button PauseButton;
         private System.Windows.Forms.Label SizeLabel;
         private System.Windows.Forms.ComboBox SizeComboBox;
