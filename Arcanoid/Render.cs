@@ -23,8 +23,6 @@ namespace Arcanoid
             _gameState = gameState;
         }
 
-        
-
         /// <summary>
         /// Отрисовка блоков
         /// </summary>
@@ -46,8 +44,8 @@ namespace Arcanoid
         /// </summary>
         private Rectangle CreateBlockRectangle(Block block)
         {
-            var x = Convert.ToInt32(block.Position.X * scale.X);
-            var y = Convert.ToInt32(block.Position.Y * scale.Y);
+            var x = Convert.ToInt32(block.BlockRectangle.X * scale.X);
+            var y = Convert.ToInt32(block.BlockRectangle.Y * scale.Y);
             var height = Convert.ToInt32(block.Height * scale.Y);
             var width = Convert.ToInt32(block.Width * scale.X);
             var rect = new Rectangle(x, y, width, height);
@@ -55,7 +53,43 @@ namespace Arcanoid
         }
 
         /// <summary>
-        /// Отрисовка шарика, платформы и блоков
+        /// Отрисовка шарика
+        /// </summary>
+        /// <param name="graph"></param>
+        private void DrawBallAsRectangle(Graphics graph)
+        {
+            Pen blackPen1 = new Pen(Color.FromArgb(255, 0, 0, 0), 1);
+            var ball = new Rectangle
+            {
+                X = Convert.ToInt32(_gameState.Ball.BallRectangle.X * scale.X),
+                Y = Convert.ToInt32(_gameState.Ball.BallRectangle.Y * scale.Y),
+                Height = Convert.ToInt32(_gameState.Ball.BallRectangle.Height * scale.Y),
+                Width = Convert.ToInt32(_gameState.Ball.BallRectangle.Width * scale.X),
+            };
+            graph.DrawEllipse(blackPen1, ball);
+            graph.FillEllipse(Brushes.Orange, ball);
+        }
+
+        /// <summary>
+        /// Отрисовка платформы
+        /// </summary>
+        /// <param name="graph"></param>
+        private void DrawPlatformAsRectangle(Graphics graph)
+        {
+            Pen blackPen2 = new Pen(Color.FromArgb(255, 0, 0, 0), 2);
+            var platform = new Rectangle()
+            {
+                X = Convert.ToInt32(_gameState.Platform.PlatformRectangle.X * scale.X),
+                Y = Convert.ToInt32(_gameState.Platform.PlatformRectangle.Y * scale.Y),
+                Height = Convert.ToInt32(_gameState.Platform.Height * scale.Y),
+                Width = Convert.ToInt32(_gameState.Platform.Width * scale.X)
+            };
+            graph.DrawRectangle(blackPen2, platform);
+            graph.FillRectangle(Brushes.Red, platform);
+        }
+
+        /// <summary>
+        /// Отрисовка картинки буфера
         /// </summary>
         public void Draw()
         {
@@ -64,32 +98,13 @@ namespace Arcanoid
                 using (var graph = Graphics.FromImage(BackBuffer))
                 {
                     graph.Clear(Color.SkyBlue);
-                    Pen blackPen1 = new Pen(Color.FromArgb(255, 0, 0, 0), 1);
-                    Pen blackPen2 = new Pen(Color.FromArgb(255, 0, 0, 0), 2);
-                    var ball = new Rectangle
-                    {
-                        X = Convert.ToInt32(_gameState.Ball.Position.X * scale.X),
-                        Y = Convert.ToInt32(_gameState.Ball.Position.Y * scale.Y),
-                        Height = Convert.ToInt32(_gameState.Ball.Diameter * scale.Y),
-                        Width = Convert.ToInt32(_gameState.Ball.Diameter * scale.X),
-                    };
-                    graph.DrawEllipse(blackPen1, ball);
-                    graph.FillEllipse(Brushes.Orange, ball);
-
-                    var platform = new Rectangle()
-                    {
-                        X = Convert.ToInt32(_gameState.Platform.Position.X * scale.X),
-                        Y = Convert.ToInt32(_gameState.Platform.Position.Y * scale.Y),
-                        Height = Convert.ToInt32(_gameState.Platform.Height * scale.Y),
-                        Width = Convert.ToInt32(_gameState.Platform.Width * scale.X)
-                    };
-                    graph.DrawRectangle(blackPen2, platform);
-                    graph.FillRectangle(Brushes.Red, platform);
-
+                    DrawBallAsRectangle(graph);
+                    DrawPlatformAsRectangle(graph);
                     DrawBlockAsRectangles(graph);
                 }
             }
         }
+
         /// <summary>
         /// Загрузка текстур для блоков из файла "TexturePack.png"
         /// </summary>
@@ -187,6 +202,7 @@ namespace Arcanoid
             texture8.TextureBrush = GetTextureBrush(textureRect8, rect.Width, rect.Height, textureImage);
             TextureList.Add(texture8);
         }
+
         /// <summary>
         /// Обрезка текстуры блока
         /// </summary>
@@ -206,6 +222,7 @@ namespace Arcanoid
             }
             return target;
         }
+
         /// <summary>
         /// Загрузка каждой текстуры из файла
         /// </summary>
@@ -222,6 +239,7 @@ namespace Arcanoid
             TextureBrush textureBrush = new TextureBrush(cropBitmap);
             return textureBrush;
         }
+
         /// <summary>
         /// Скалирование виртуальный размеров шарика блоков и платформы к размерам для отрисовки в главное окно
         /// </summary>

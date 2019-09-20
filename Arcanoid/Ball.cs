@@ -9,8 +9,11 @@ namespace Arcanoid
 {
     public class Ball
     {
-        public PointF Position;
+        //public PointF Position { get; set; }
         public int Diameter { get; set; }
         public int Texture { get; set; }
+
+        public RectangleF BallRectangle { get; set; }
+        
     }
 }

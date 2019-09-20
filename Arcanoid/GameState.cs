@@ -24,26 +24,49 @@ namespace Arcanoid
         {
             Ball = new Ball()
             {
-                Position = new PointF(97, 286),
+                //Position = new PointF(97, 286),
                 Diameter = 4,
-                Texture = 9
+                Texture = 9,
+                BallRectangle = new RectangleF()
+                {
+                    Location = new PointF(97, 286),
+                    Height = 4,
+                    Width = 4
+                }
             };
             Platform = new Platform()
             {
-                Position = new Point(90, 291),
+                //Position = new Point(90, 291),
                 Height = 5,
                 Width = 20,
-                Texture = 10
+                Texture = 10,
+                PlatformRectangle = new RectangleF()
+                {
+                    Location = new Point(90, 291),
+                    Height = 5,
+                    Width = 20
+                }
             };
             Blocks = new Block[0, 0];
         }
 
-        public void StartPositions()
+        /// <summary>
+        /// Установка шарика и платформы в стартовую позицию
+        /// </summary>
+        public void SetStartPositions()
         {
-            Ball.Position = new PointF(97, 286);
-            Platform.Position = new Point(90, 291);
+            var ballRect = Ball.BallRectangle;
+            ballRect.Location= new PointF(97, 286);
+            Ball.BallRectangle = ballRect;
+            var platRect = Platform.PlatformRectangle;
+            platRect.Location = new Point(90, 291);
+            Platform.PlatformRectangle = platRect;
         }
 
+        /// <summary>
+        /// Уставка сложности в зависимости от выбранной в настройках
+        /// </summary>
+        /// <param name="currentDifficulty"></param>
         public void SwitchDifficulty(string currentDifficulty)
         {
             switch (currentDifficulty)
@@ -71,7 +94,7 @@ namespace Arcanoid
         }
 
         /// <summary>
-        /// Создание массива с блоками
+        /// Создание массива блоков
         /// </summary>
         /// <param name="x">координата X блока</param>
         /// <param name="y">координата Y блока</param>
@@ -90,14 +113,21 @@ namespace Arcanoid
                     var randomTextureNumber = random.Next(1, 8);
                     blocks[i, j] = new Block
                     {
-                        Height = 10,
-                        Width = 20,
-                        Position = new Point
+                        Height = blockHeight,
+                        Width = blockWidth,
+                        //Position = new Point
+                        //{
+                        //    X = i * blockWidth,
+                        //    Y = j * blockHeight
+                        //},
+                        TextureNumber = randomTextureNumber,
+                        BlockRectangle = new RectangleF()
                         {
-                            X = i * blockWidth,
-                            Y = j * blockHeight
-                        },
-                        TextureNumber = randomTextureNumber
+                            X  = i * blockWidth,
+                            Y = j * blockHeight,
+                            Height = blockHeight,
+                            Width = blockWidth
+                        }
                     };
 
                     var randomNumber = random.Next(1, 100);
@@ -112,7 +142,6 @@ namespace Arcanoid
                     }
                 }
             }
-
             return blocks;
         }
     }

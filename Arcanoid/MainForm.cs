@@ -47,7 +47,7 @@ namespace Arcanoid
             platformHaste = PlatformHasteTrackBar.Value;
             _logic = new Logic(_gameState);
         }
-        //отрисовка из буфера в окно
+        //Отрисовка из буфера в окно
         private void MainWindow_Paint(object sender, PaintEventArgs e)
         {
             if (_render.BackBuffer != null)
@@ -58,17 +58,22 @@ namespace Arcanoid
 
         private void RefreshTimer_Tick(object sender, EventArgs e)
         {
-            //отрисовка в буфер
+            //Отрисовка в буфер
             _render.Draw();
             MainWindow.Refresh();
+            //Проверка выигрыша игры
             if(_gameState.WinGame)
             {
-                WinGame();
+                _gameState.WinGame = false;
+                StopGameOnWin();
             }
+            //Проверка проигрыша игры
             if(_gameState.LoseGame)
             {
-                EndGame();
+                _gameState.LoseGame = false;
+                StopGameOnLose();
             }
+            //Проверка изменения жизней
             if(_gameState.ChangeLife)
             {
                 _gameState.ChangeLife = false;
@@ -92,6 +97,7 @@ namespace Arcanoid
             SelectSize();
             _render.ScaleSize(MainWindow.Height, MainWindow.Width, _logic.VirtualHeight, _logic.VirtualWidth);
             _logic.StartGame(difficulty);
+            lifeNumberLabel.Text = _gameState.Life.ToString();
             _render.TextureList.Clear();
             _render.AddBlockTextureList();
             
@@ -171,7 +177,7 @@ namespace Arcanoid
         /// <summary>
         /// Остановка игры если хп = 0
         /// </summary>
-        public void EndGame()
+        public void StopGameOnLose()
         {
             RefreshTimer.Stop();
             _logic.LogicTimer.Stop();
@@ -188,9 +194,9 @@ namespace Arcanoid
             }
         }
         /// <summary>
-        /// Выигрыш игры если выбиты все блоки
+        /// Остановка игры при выигрыше
         /// </summary>
-        public void WinGame()
+        public void StopGameOnWin()
         {
             RefreshTimer.Stop();
             _logic.LogicTimer.Stop();
@@ -218,11 +224,6 @@ namespace Arcanoid
             MainMenuGroupBox.Visible = true;
             _gameState.Pause = false;
             GameGroupBox.Visible = false;
-        }
-
-        public void RefreshMainWindow()
-        {
-            MainWindow.Refresh();
         }
 
         private void PauseButton_Click(object sender, EventArgs e)
@@ -318,7 +319,7 @@ namespace Arcanoid
             GameGroupBox.Location = location;
         }
         /// <summary>
-        /// Размеры главного игрового окна
+        /// Установка размеров игрового окна
         /// </summary>
         private void SelectSize()
         {
@@ -352,13 +353,17 @@ namespace Arcanoid
             {
                 if (!_gameState.Pause)
                 {
-                    if (_gameState.Platform.Position.X - platformHaste >= 0)
+                    var platRect = _gameState.Platform.PlatformRectangle;
+                    if (platRect.X - platformHaste >= 0)
                     {
-                        _gameState.Platform.Position.X -= platformHaste;
+                        platRect.X -= platformHaste;
+                        _gameState.Platform.PlatformRectangle = platRect;
 
                         if (!_gameState.GameStarted)
                         {
-                            _gameState.Ball.Position.X -= platformHaste;
+                            var ballRect = _gameState.Ball.BallRectangle;
+                            ballRect.X -= platformHaste;
+                            _gameState.Ball.BallRectangle = ballRect;
 
                             MainWindow.Refresh();
                         }
@@ -369,13 +374,16 @@ namespace Arcanoid
             {
                 if (!_gameState.Pause)
                 {
-                    if (_gameState.Platform.Position.X + platformHaste <= _logic.VirtualWidth - _gameState.Platform.Width)
+                    var platRect = _gameState.Platform.PlatformRectangle;
+                    if (platRect.X + platformHaste <= _logic.VirtualWidth - _gameState.Platform.Width)
                     {
-                        _gameState.Platform.Position.X += platformHaste;
-
+                        platRect.X += platformHaste;
+                        _gameState.Platform.PlatformRectangle = platRect;
                         if (!_gameState.GameStarted)
                         {
-                            _gameState.Ball.Position.X += platformHaste;
+                            var ballRect = _gameState.Ball.BallRectangle;
+                            ballRect.X += platformHaste;
+                            _gameState.Ball.BallRectangle = ballRect;
 
                             MainWindow.Refresh();
                         }
