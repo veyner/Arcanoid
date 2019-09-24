@@ -9,12 +9,12 @@ namespace Arcanoid
 {
     public class Block
     {
-        //public Point Position;
+        public LocalPoint Position;
         public bool Visible { get; set; }
         public int Height { get; set; }
         public int Width { get; set; }
         public int TextureNumber { get; set; }
-        public RectangleF BlockRectangle { get; set; }
+        //public RectangleF BlockRectangle { get; set; }
 
         public Block()
         {

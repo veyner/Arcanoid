@@ -24,28 +24,16 @@ namespace Arcanoid
         {
             Ball = new Ball()
             {
-                //Position = new PointF(97, 286),
-                Diameter = 4,
+                Position = new LocalPoint(),
+                Diameter = 8,
                 Texture = 9,
-                BallRectangle = new RectangleF()
-                {
-                    Location = new PointF(97, 286),
-                    Height = 4,
-                    Width = 4
-                }
             };
             Platform = new Platform()
             {
-                //Position = new Point(90, 291),
-                Height = 5,
-                Width = 20,
+                Position = new LocalPoint(),
+                Height = 10,
+                Width = 40,
                 Texture = 10,
-                PlatformRectangle = new RectangleF()
-                {
-                    Location = new Point(90, 291),
-                    Height = 5,
-                    Width = 20
-                }
             };
             Blocks = new Block[0, 0];
         }
@@ -55,12 +43,11 @@ namespace Arcanoid
         /// </summary>
         public void SetStartPositions()
         {
-            var ballRect = Ball.BallRectangle;
-            ballRect.Location= new PointF(97, 286);
-            Ball.BallRectangle = ballRect;
-            var platRect = Platform.PlatformRectangle;
-            platRect.Location = new Point(90, 291);
-            Platform.PlatformRectangle = platRect;
+            Ball.Position.X = 194;
+            Ball.Position.Y = 572;
+
+            Platform.Position.X = 180;
+            Platform.Position.Y = 582;
         }
 
         /// <summary>
@@ -103,8 +90,8 @@ namespace Arcanoid
         private Block[,] CreateBlocks(int x, int y, int difficulty)
         {
             Block[,] blocks = new Block[x, y];
-            var blockHeight = 10;
-            var blockWidth = 20;
+            var blockHeight = 20;
+            var blockWidth = 40;
             var random = new Random();
             for (int i = 0; i < x; i++)
             {
@@ -115,19 +102,12 @@ namespace Arcanoid
                     {
                         Height = blockHeight,
                         Width = blockWidth,
-                        //Position = new Point
-                        //{
-                        //    X = i * blockWidth,
-                        //    Y = j * blockHeight
-                        //},
-                        TextureNumber = randomTextureNumber,
-                        BlockRectangle = new RectangleF()
+                        Position = new LocalPoint
                         {
-                            X  = i * blockWidth,
-                            Y = j * blockHeight,
-                            Height = blockHeight,
-                            Width = blockWidth
-                        }
+                            X = i * blockWidth,
+                            Y = j * blockHeight
+                        },
+                        TextureNumber = randomTextureNumber,
                     };
 
                     var randomNumber = random.Next(1, 100);

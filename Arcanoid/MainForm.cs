@@ -137,6 +137,7 @@ namespace Arcanoid
             DifficultyComboBox.DataSource = diffList;
             DifficultyComboBox.DisplayMember = nameof(diffList);
         }
+
         /// <summary>
         /// Лист размеров окна для настроек
         /// </summary>
@@ -353,18 +354,12 @@ namespace Arcanoid
             {
                 if (!_gameState.Pause)
                 {
-                    var platRect = _gameState.Platform.PlatformRectangle;
-                    if (platRect.X - platformHaste >= 0)
+                    if (_gameState.Platform.Position.X - platformHaste >= 0)
                     {
-                        platRect.X -= platformHaste;
-                        _gameState.Platform.PlatformRectangle = platRect;
-
+                        _gameState.Platform.Position.X -= platformHaste;
                         if (!_gameState.GameStarted)
                         {
-                            var ballRect = _gameState.Ball.BallRectangle;
-                            ballRect.X -= platformHaste;
-                            _gameState.Ball.BallRectangle = ballRect;
-
+                            _gameState.Ball.Position.X -= platformHaste;
                             MainWindow.Refresh();
                         }
                     }
@@ -374,17 +369,12 @@ namespace Arcanoid
             {
                 if (!_gameState.Pause)
                 {
-                    var platRect = _gameState.Platform.PlatformRectangle;
-                    if (platRect.X + platformHaste <= _logic.VirtualWidth - _gameState.Platform.Width)
+                    if (_gameState.Platform.Position.X + platformHaste <= _logic.VirtualWidth - _gameState.Platform.Width)
                     {
-                        platRect.X += platformHaste;
-                        _gameState.Platform.PlatformRectangle = platRect;
+                        _gameState.Platform.Position.X += platformHaste;
                         if (!_gameState.GameStarted)
                         {
-                            var ballRect = _gameState.Ball.BallRectangle;
-                            ballRect.X += platformHaste;
-                            _gameState.Ball.BallRectangle = ballRect;
-
+                            _gameState.Ball.Position.X += platformHaste;
                             MainWindow.Refresh();
                         }
                     }

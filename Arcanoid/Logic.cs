@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Timers;
 
 namespace Arcanoid
@@ -10,19 +9,19 @@ namespace Arcanoid
         public Timer LogicTimer; // Таймер просчет логики игры
 
         //Виртуальные координаты, относительно которых считается вся логика игры
-        public int VirtualHeight = 300; 
-        public int VirtualWidth = 200;
+        public int VirtualHeight = 600;
+        public int VirtualWidth = 400;
 
         private GameState _gameState;
-        private PointF ballMoveStepAndDirect; // Направление и шаг перемещения шарика
-        private PointF startAndCentralPlatDirect = new PointF((float)-1, (float)-1); // Направление движения шарика - начальное и при отбитии от центральной части платформы 
-        private PointF secondAndFourthPlatDirect = new PointF((float)-1.4, (float)-0.6); // Направление движения шарика при отбитии от второй и четвертой части платформы
-        private PointF firstAndFifthPlatDirect = new PointF((float)-1.7, (float)-0.3); // Направление движения шарика при отбитии от первой и пятой части платформы
-        private int invisibleBlock = 0;
+        private LocalPoint _ballVector = new LocalPoint() { X = (float)(-1.5), Y = (float)(-1.5) }; // Направление и шаг перемещения шарика
+        private LocalPoint _startAndCentralPlatDirect = new LocalPoint(){ X = (float)(-1.5) , Y = (float)(-1.5) }; // Направление движения шарика - начальное и при отбитии от центральной части платформы 
+        private LocalPoint _secondAndFourthPlatDirect = new LocalPoint(){ X= (float)(-1.9), Y = (float)(-1.1) }; // Направление движения шарика при отбитии от второй и четвертой части платформы
+        private LocalPoint _firstAndFifthPlatDirect = new LocalPoint(){ X=(float)(-2.2), Y=(float)(-0.8) }; // Направление движения шарика при отбитии от первой и пятой части платформы
+        private int _invisibleBlock = 0;
 
         // Переменная для проверки отбился ли шарик от платформы, позволяя избежать многократного вычисления. 
         // Изменяется на false при отбитии шарика от блока или верхней стороны игрового поля
-        private bool ballOutOfPlatform = true; 
+        private bool _ballOutOfPlatform = true; 
 
 
         public Logic(GameState gameState)
@@ -43,7 +42,7 @@ namespace Arcanoid
         /// </summary>
         private void CleanInvisibleBlock()
         {
-            invisibleBlock = 0;
+            _invisibleBlock = 0;
             _gameState.InvisibleBlocksAtStart = 0;
         }
 
@@ -55,7 +54,7 @@ namespace Arcanoid
         private void RemoveBlock(Block block, int blockQuantity)
         {
             block.Visible = false;
-            invisibleBlock += blockQuantity;
+            _invisibleBlock += blockQuantity;
         }
 
         /// <summary>
@@ -63,7 +62,7 @@ namespace Arcanoid
         /// </summary>
         private void CheckInvisibleBlocksNumber()
         {
-            if (_gameState.InvisibleBlocksAtStart + invisibleBlock == _gameState.Blocks.Length)
+            if (_gameState.InvisibleBlocksAtStart + _invisibleBlock == _gameState.Blocks.Length)
             {
                 _gameState.WinGame = true;
             }
@@ -72,12 +71,12 @@ namespace Arcanoid
         /// <summary>
         /// Проверка позиции шарика отностительно сторон игрового поля
         /// </summary>
-        private void CheckBallOutOfGameWindow(RectangleF ball)
+        private void CheckBallOutOfGameWindow(Ball ball)
         {
             //Eсли шарик вылетел за нижний предел игрового окна - отнимается жизнь. 
             //Шарик и платформы возвращаются в стартовую позицию, задается первоначальное направление шарика
             //Eсли число жизней = 0 - игра завершается
-            if (ball.Y + _gameState.Ball.Diameter >= VirtualHeight)
+            if (ball.Position.Y + _gameState.Ball.Diameter >= VirtualHeight)
             {
                 _gameState.Life--;
                 _gameState.ChangeLife = true;
@@ -88,17 +87,18 @@ namespace Arcanoid
                 _gameState.GameStarted = false;
                 _gameState.SetStartPositions();
                 SetStartDirection();
-                ballOutOfPlatform = true;
+                _ballOutOfPlatform = true;
             }
 
-            if (ball.X <= 0 || ball.X + ball.Width >= VirtualWidth)
+            //При отбитии от боковых сторон и верхней стороны игрового поля - меняется направление движения шарика
+            if (ball.Position.X <= 0 || ball.Position.X + ball.Diameter >= VirtualWidth)
             {
-                ballMoveStepAndDirect.X *= -1;
+                _ballVector.X *= -1;
             }
-            if (ball.Y <= 0)
+            if (ball.Position.Y <= 0)
             {
-                ballMoveStepAndDirect.Y *= -1;
-                ballOutOfPlatform = false;
+                _ballVector.Y *= -1;
+                _ballOutOfPlatform = false;
             }
         }
 
@@ -106,26 +106,34 @@ namespace Arcanoid
         /// Изменить направление шарика при столкновении с блоком или блоками
         /// </summary>
         /// <param name="ball"></param>
-        private void ChangeBallDirectionAtCollisionWithBlocks(RectangleF ball, List<Block> intersectedBlockList)
+        private void ChangeBallDirectionAtCollisionWithBlocks(Ball ball, List<Block> intersectedBlockList)
         {
             if (intersectedBlockList.Count == 1)
             {
-                if (CheckBallCollisionWithSingleBlock(intersectedBlockList[0], ball))
+                var rectSizeNumber = CheckBallCollisionWithSingleBlock(intersectedBlockList[0], ball);
+                if(rectSizeNumber != 0)
                 {
+                    if (rectSizeNumber == 1 || rectSizeNumber == 3)
+                    {
+                        _ballVector.X *= -1;
+                    }
+                    else if (rectSizeNumber == 4 || rectSizeNumber == 2)
+                    {
+                        _ballVector.Y *= -1;
+                    }
                     RemoveBlock(intersectedBlockList[0], intersectedBlockList.Count);
+                    _ballOutOfPlatform = false;
                 }
-                ballOutOfPlatform = false;
+                
             }
             else if (intersectedBlockList.Count == 2)
             {
-                if (ChangeBallDirectionAtCollisionWithTwoBlocks(intersectedBlockList))
+                ChangeBallDirectionAtCollisionWithTwoBlocks(intersectedBlockList);
+                foreach (Block block in intersectedBlockList)
                 {
-                    foreach (Block block in intersectedBlockList)
-                    {
-                        RemoveBlock(block, intersectedBlockList.Count);
-                    }
+                    RemoveBlock(block, intersectedBlockList.Count);
                 }
-                ballOutOfPlatform = false;
+                _ballOutOfPlatform = false;
             }
         }
 
@@ -134,26 +142,23 @@ namespace Arcanoid
         /// </summary>
         /// <param name="intersectedBlockList"></param>
         /// <returns>true - позволяет удалить блоки с игрового поля</returns>
-        private bool ChangeBallDirectionAtCollisionWithTwoBlocks(List<Block> intersectedBlockList)
+        private void ChangeBallDirectionAtCollisionWithTwoBlocks(List<Block> intersectedBlockList)
         {
             var block1 = intersectedBlockList[0];
             var block2 = intersectedBlockList[1];
 
-            if (block1.BlockRectangle.X == block2.BlockRectangle.X)
+            if (block1.Position.X == block2.Position.X)
             {
-                ballMoveStepAndDirect.X *= -1;
-                return true;
+                _ballVector.X *= -1;
             }
-            else if (block1.BlockRectangle.Y == block2.BlockRectangle.Y)
+            else if (block1.Position.Y == block2.Position.Y)
             {
-                ballMoveStepAndDirect.Y *= -1;
-                return true;
+                _ballVector.Y *= -1;
             }
             else
             {
-                ballMoveStepAndDirect.Y *= -1;
-                ballMoveStepAndDirect.X *= -1;
-                return true;
+                _ballVector.Y *= -1;
+                _ballVector.X *= -1;
             }
         }
 
@@ -162,28 +167,26 @@ namespace Arcanoid
         /// Изменение направления движения шарика
         /// Перемещение шарика
         /// </summary>
-        public void CheckGameStatus()
+        private void CheckGameStatus()
         {
-            var ballRectangle = _gameState.Ball.BallRectangle;
             CheckInvisibleBlocksNumber();
-            CheckBallOutOfGameWindow(ballRectangle);
-            CheckBallAndPlatformCollision(ballRectangle);
-            var intersectedBlocks = CheckBallCollisionWithBlocks(ballRectangle);//проверка - сколько блоков зацепил шарик
-            ChangeBallDirectionAtCollisionWithBlocks(ballRectangle, intersectedBlocks);
-            MoveBall(ballRectangle);
+            CheckBallOutOfGameWindow(_gameState.Ball);
+            CheckBallAndPlatformCollision(_gameState.Ball);
+            var intersectedBlocks = CheckBallCollisionWithBlocks(_gameState.Ball);//проверка - сколько блоков зацепил шарик
+            ChangeBallDirectionAtCollisionWithBlocks(_gameState.Ball, intersectedBlocks);
+            MoveBall(_gameState.Ball);
         }
 
         /// <summary>
         /// Перемещение шарика на заданный шаг
         /// </summary>
-        /// <param name="ballRectangle"></param>
-        private void MoveBall(RectangleF ballRectangle)
+        /// <param name="ball"></param>
+        private void MoveBall(Ball ball)
         {
             if (_gameState.GameStarted && !_gameState.Pause)
             {
-                ballRectangle.X += ballMoveStepAndDirect.X;
-                ballRectangle.Y += ballMoveStepAndDirect.Y;
-                _gameState.Ball.BallRectangle = ballRectangle;
+                ball.Position.X += _ballVector.X;
+                ball.Position.Y += _ballVector.Y;
             }
         }
 
@@ -206,12 +209,12 @@ namespace Arcanoid
         /// <param name="ball"></param>
         /// <param name="platform"></param>
         /// <returns></returns>
-        private float CountBallAngleToPlatform(RectangleF ball, RectangleF platform)
+        private float CountBallAngleToPlatform(Ball ball, Platform platform)
         {
-            float x1 = ball.X + ball.Width / 2;
-            float y1 = ball.Y + ball.Height / 2;
-            float x2 = platform.X + (platform.Width / 2);
-            float y2 = platform.Y + (platform.Height / 2);
+            float x1 = ball.Position.X + ball.Diameter / 2;
+            float y1 = ball.Position.Y + ball.Diameter / 2;
+            float x2 = platform.Position.X + (platform.Width / 2);
+            float y2 = platform.Position.Y + (platform.Height / 2);
 
             float ballAngle= (float)(Math.Atan2(y1 - y2, x1 - x2) / Math.PI * 180);
             ballAngle = (ballAngle < 0) ? ballAngle + 360 : ballAngle;
@@ -227,31 +230,32 @@ namespace Arcanoid
         }
 
         /// <summary>
-        /// Проверка столкновения шарика и платформы
+        /// Проверка столкновения шарика и платформы. 
+        /// Если произошло столкновение - вычисление части платформы, куда попал шарик и отбитие шарика с заданным направлением
         /// </summary>
         /// <param name="ballRect"></param>
-        private void CheckBallAndPlatformCollision(RectangleF ballRect)
+        private void CheckBallAndPlatformCollision(Ball ball)
         {
-            var platRect = _gameState.Platform.PlatformRectangle;
-            if (!ballOutOfPlatform)
+            var platform = _gameState.Platform;
+            if (!_ballOutOfPlatform)
             {
-                if (ballRect.IntersectsWith(platRect))
+                if (Intersects(ball,platform.Position.X,platform.Position.Y,platform.Width,platform.Height))
                 {
-                    ballOutOfPlatform = true; //пересечение шарика и платформы
-                    ChangeBallDirectionAtPlatformCollision(ballRect, platRect);
+                    _ballOutOfPlatform = true; //пересечение шарика и платформы
+                    var platformPart = FindPlatformPartOnCollisionWithBall(ball, platform);
+                    ChangeBallDirectionAtCollisionWithPlatform(platformPart);
                 }
             }
         }
 
         /// <summary>
-        /// Изменение направления шарика при столкновении с платформой
+        /// Расчет, в какую часть платформы прилетел шарик
         /// </summary>
-        /// <param name="ballRect"></param>
-        private void ChangeBallDirectionAtPlatformCollision(RectangleF ballRect, RectangleF platRect)
+        /// <param name="ball"></param>
+        private int FindPlatformPartOnCollisionWithBall(Ball ball, Platform platform)
         {
-
             //Вычисление внутренних углов платформы образованные диагоналями
-            var horizonAngle = CountRectangleAngle(platRect.Height, platRect.Width) * 2;
+            var horizonAngle = CountRectangleAngle(platform.Height, platform.Width) * 2;
             var verticalAngle = 180 - horizonAngle;
             /*С помощью внутренних углов (образованных диагоналями прямоугольника) можно вычислить с какой стороны шарик столкнулся с платформой.
              * От центра до каждого угла прямоугольника лежит отрезок диагонали под определенным углом относительно центра платформы.
@@ -274,80 +278,136 @@ namespace Arcanoid
             var botLeft = botRight + verticalAngle;
 
             //Вычисление угла под которым шарик прилетает в платформу
-            float ballAngle = CountBallAngleToPlatform(ballRect, platRect);
+            float ballAngle = CountBallAngleToPlatform(ball, platform);
             var platformPartAngle = verticalAngle / 5;
             //Разделение платформы на 5 частей
             var platformAngle1 = topLeft + platformPartAngle;
             var platformAngle2 = platformAngle1 + platformPartAngle;
             var platformAngle3 = platformAngle2 + platformPartAngle;
             var platformAngle4 = platformAngle3 + platformPartAngle;
-            var intersectRect = RectangleF.Intersect(ballRect, platRect);
+
+            //номер части платформы, с которой столкнулся шарик (15 - 1 и 5 части платформы, 24 - 2 и 4 части платформы, 3 - центральная часть платформы, 6-7 -если шарик столкнулся с боковыми сторонами)
+            var platformPartNumber = 0; 
             //Проверка в какую часть платформы прилетел шарик
-            //У каждой платформы свой угол отбития шарика
-            if (intersectRect.Width >= intersectRect.Height && ballAngle > topLeft && ballAngle < topright)
+            
+            if (ballAngle > topLeft && ballAngle < topright)
             {
                 if (topLeft <= ballAngle && ballAngle <= platformAngle1 || platformAngle4 <= ballAngle && ballAngle <= topright)
                 {
-                    if (ballMoveStepAndDirect.X < 0)
-                    {
-                        ballMoveStepAndDirect.X = firstAndFifthPlatDirect.X;
-                    }
-                    else
-                    {
-                        ballMoveStepAndDirect.X = firstAndFifthPlatDirect.X * (-1);
-                    }
-                    ballMoveStepAndDirect.Y = firstAndFifthPlatDirect.Y;
+                    platformPartNumber = 15;
                 }
                 else if (platformAngle1 < ballAngle && ballAngle < platformAngle2 || platformAngle3 < ballAngle && ballAngle < platformAngle4)
                 {
-                    if (ballMoveStepAndDirect.X < 0)
-                    {
-                        ballMoveStepAndDirect.X = secondAndFourthPlatDirect.X;
-                    }
-                    else
-                    {
-                        ballMoveStepAndDirect.X = secondAndFourthPlatDirect.X * (-1);
-                    }
-                    ballMoveStepAndDirect.Y = secondAndFourthPlatDirect.Y;
+                    
+                    platformPartNumber = 24;
                 }
                 else if (platformAngle2 <= ballAngle && ballAngle <= platformAngle3)
                 {
-                    if (ballMoveStepAndDirect.X < 0)
-                    {
-                        ballMoveStepAndDirect.X = startAndCentralPlatDirect.X;
-                    }
-                    else
-                    {
-                        ballMoveStepAndDirect.X = startAndCentralPlatDirect.X * (-1);
-                    }
-                    ballMoveStepAndDirect.Y = startAndCentralPlatDirect.Y;
+                    
+                    platformPartNumber = 3;
                 }
             }
-            //Если шарик прилетает в боковую сторону платформы
-            //В зависимости от направления его движения:
-            //Направление шарика меняется по Y или по X и Y
-            else if (ballMoveStepAndDirect.X < 0)
+            
+            else if (_ballVector.X < 0)
             {
                 if (0 <= ballAngle && ballAngle < topLeft || ballAngle <= 360 && botLeft <= ballAngle)
                 {
-                    ballMoveStepAndDirect.Y *= -1;
+                    platformPartNumber = 6;
                 }
                 else if (topright <= ballAngle && ballAngle <= botRight)
                 {
-                    ballMoveStepAndDirect.X *= -1;
-                    ballMoveStepAndDirect.Y *= -1;
+                    platformPartNumber = 7;
                 }
+                
             }
-            else if (ballMoveStepAndDirect.X > 0)
+            else if (_ballVector.X > 0)
             {
                 if (0 <= ballAngle && ballAngle <= topLeft || ballAngle <= 360 && botLeft <= ballAngle)
                 {
-                    ballMoveStepAndDirect.X *= -1;
-                    ballMoveStepAndDirect.Y *= -1;
+                    
+                    platformPartNumber = 6;
                 }
                 else if (topright < ballAngle && ballAngle <= botRight)
                 {
-                    ballMoveStepAndDirect.Y *= -1;
+                    platformPartNumber = 7;
+                }
+            }
+            return platformPartNumber;
+        }
+
+        /// <summary>
+        /// Изменение направления шарика в зависимости от части платформы, куда он попал
+        /// </summary>
+        /// <param name="platformPart"></param>
+        private void ChangeBallDirectionAtCollisionWithPlatform(int platformPart)
+        {
+            if(platformPart != 0)
+            {
+                //У каждой части платформы свой угол отбития шарика
+                if (platformPart == 15)
+                {
+                    if (_ballVector.X < 0)
+                    {
+                        _ballVector.X = _firstAndFifthPlatDirect.X;
+                    }
+                    else
+                    {
+                        _ballVector.X = _firstAndFifthPlatDirect.X * (-1);
+                    }
+                    _ballVector.Y = _firstAndFifthPlatDirect.Y;
+                }
+                else if (platformPart == 24)
+                {
+                    if (_ballVector.X < 0)
+                    {
+                        _ballVector.X = _secondAndFourthPlatDirect.X;
+                    }
+                    else
+                    {
+                        _ballVector.X = _secondAndFourthPlatDirect.X * (-1);
+                    }
+                    _ballVector.Y = _secondAndFourthPlatDirect.Y;
+                }
+                else if (platformPart == 3)
+                {
+                    if (_ballVector.X < 0)
+                    {
+                        _ballVector.X = _startAndCentralPlatDirect.X;
+                    }
+                    else
+                    {
+                        _ballVector.X = _startAndCentralPlatDirect.X * (-1);
+                    }
+                    _ballVector.Y = _startAndCentralPlatDirect.Y;
+                }
+                //Если шарик прилетает в боковую сторону платформы
+                //В зависимости от направления его движения:
+                //Направление шарика меняется по Y или по X и Y
+                else if (platformPart == 6)
+                {
+                    if (_ballVector.X > 0)
+                    {
+                        _ballVector.X *= -1;
+                        _ballVector.Y *= -1;
+                    }
+                    else
+                    {
+                        _ballVector.Y *= -1;
+
+                    }
+                }
+                else if (platformPart == 7)
+                {
+                    if (_ballVector.X > 0)
+                    {
+                        _ballVector.Y *= -1;
+
+                    }
+                    else
+                    {
+                        _ballVector.X *= -1;
+                        _ballVector.Y *= -1;
+                    }
                 }
             }
         }
@@ -356,14 +416,14 @@ namespace Arcanoid
         /// Подсчет сколько блоков шарик задел при столкновении
         /// </summary>
         /// <param name="ball"></param>
-        private List<Block> CheckBallCollisionWithBlocks(RectangleF ball)
+        private List<Block> CheckBallCollisionWithBlocks(Ball ball)
         {
             List<Block> intersectedBlockList = new List<Block>();
             foreach (Block block in _gameState.Blocks)
             {
                 if (block.Visible)
                 {
-                    if (ball.IntersectsWith(block.BlockRectangle))
+                    if (Intersects(ball, block.Position.X,block.Position.Y, block.Width,block.Height))
                     {
                         intersectedBlockList.Add(block);
                     }
@@ -378,12 +438,12 @@ namespace Arcanoid
         /// <param name="ball"></param>
         /// <param name="block"></param>
         /// <returns></returns>
-        private float CountBallAngleToBlock(RectangleF ball, Block block)
+        private float CountBallAngleToBlock(Ball ball, Block block)
         {
-            float x1 = ball.X + _gameState.Ball.Diameter / 2;
-            float y1 = ball.Y + _gameState.Ball.Diameter / 2;
-            float x2 = block.BlockRectangle.X + (block.Width / 2);
-            float y2 = block.BlockRectangle.Y + (block.Height / 2);
+            float x1 = ball.Position.X + _gameState.Ball.Diameter / 2;
+            float y1 = ball.Position.Y + _gameState.Ball.Diameter / 2;
+            float x2 = block.Position.X + (block.Width / 2);
+            float y2 = block.Position.Y + (block.Height / 2);
 
             var tanY = y1 - y2;
             var tanX = x1 - x2;
@@ -402,7 +462,7 @@ namespace Arcanoid
         /// <param name="block"></param>
         /// <param name="ball"></param>
         /// <returns>true - позволяет удалить блок, с которым столкнулся шарик</returns>
-        private bool CheckBallCollisionWithSingleBlock(Block block, RectangleF ball)
+        private int CheckBallCollisionWithSingleBlock(Block block, Ball ball)
         {
             var horizonAngle = CountRectangleAngle(block.Height,block.Width) * 2;
             var verticalAngle = 180 - horizonAngle;
@@ -413,60 +473,53 @@ namespace Arcanoid
             var botLeft = botRight + verticalAngle;
 
             var ballAngle = CountBallAngleToBlock(ball, block); //Вычисление угла, под которым шарик прилетел в блок относительно центра блока
-           
-            if (ballMoveStepAndDirect.X<0 && ballMoveStepAndDirect.Y<0)
+
+            var blockSide = 0;
+            if (_ballVector.X < 0 && _ballVector.Y < 0)
             {
                 if (botRight < ballAngle && ballAngle <= botLeft)
                 {
-                ballMoveStepAndDirect.Y *= -1;
-                    return true;
+                    blockSide = 4;
                 }
                 else if (topright <= ballAngle && ballAngle < botRight)
                 {
-                ballMoveStepAndDirect.X *= -1;
-                    return true;
+                    blockSide = 3;
                 }
             }
-            else if(ballMoveStepAndDirect.X>0 && ballMoveStepAndDirect.Y>0)
+            else if (_ballVector.X > 0 && _ballVector.Y > 0)
             {
                 if (0 <= ballAngle && ballAngle < topleft || botLeft <= ballAngle && ballAngle <= 360)
                 {
-                ballMoveStepAndDirect.X *= -1;
-                    return true;
+                    blockSide = 1;
                 }
                 else if (topleft < ballAngle && ballAngle <= topright)
                 {
-                ballMoveStepAndDirect.Y *= -1;
-                    return true;
+                    blockSide = 2;
                 }
             }
-            else if(ballMoveStepAndDirect.X<0 && ballMoveStepAndDirect.Y>0)
+            else if (_ballVector.X < 0 && _ballVector.Y > 0)
             {
                 if (topleft <= ballAngle && ballAngle < topright)
                 {
-                ballMoveStepAndDirect.Y *= -1;
-                    return true;
+                    blockSide = 2;
                 }
                 else if (topright < ballAngle && ballAngle <= botRight)
                 {
-                ballMoveStepAndDirect.X *= -1;
-                    return true;
+                    blockSide = 3;
                 }
             }
-            else if(ballMoveStepAndDirect.X>0 && ballMoveStepAndDirect.Y<0)
+            else if (_ballVector.X > 0 && _ballVector.Y < 0)
             {
                 if (botRight <= ballAngle && ballAngle < botLeft)
                 {
-                ballMoveStepAndDirect.Y *= -1;
-                    return true;
+                    blockSide = 4;
                 }
                 else if (0 <= ballAngle && ballAngle <= topleft || botLeft < ballAngle && ballAngle <= 360)
                 {
-                ballMoveStepAndDirect.X *= -1;
-                    return true;
+                    blockSide = 1;
                 }
             }
-            return false;
+            return blockSide;
         }
 
         /// <summary>
@@ -474,7 +527,8 @@ namespace Arcanoid
         /// </summary>
         public void SetStartDirection()
         {
-            ballMoveStepAndDirect = startAndCentralPlatDirect;
+            _ballVector.X = _startAndCentralPlatDirect.X;
+            _ballVector.Y = _startAndCentralPlatDirect.Y;
         }
 
         /// <summary>
@@ -489,5 +543,41 @@ namespace Arcanoid
             _gameState.SwitchDifficulty(difficulty);
             SetStartDirection();
         }
+
+        /// <summary>
+        /// Проверка пересечения окружности (шарика) и прямоугольника (платформы или блока)
+        /// </summary>
+        /// <param name="ball"></param>
+        /// <param name="rect"></param>
+        /// <returns></returns>
+        private bool Intersects(Ball ball, float rectX, float rectY, int rectWidth, int rectHeight)
+        {
+            var circleX = ball.Position.X + ball.Diameter / 2;
+            var circleY = ball.Position.Y + ball.Diameter / 2;
+            var circleDistanceX = Math.Abs(circleX - (rectX+rectWidth/2));
+            var circleDistanceY = Math.Abs(circleY - (rectY + rectHeight / 2));
+
+            if (circleDistanceX > (rectWidth / 2 + ball.Diameter/2))
+            {
+                return false;
+            }
+            if (circleDistanceY > (rectHeight / 2 + ball.Diameter / 2))
+            {
+                return false;
+            }
+
+            if (circleDistanceX <= (rectWidth / 2))
+            {
+                return true;
+            }
+            if (circleDistanceY <= (rectHeight / 2))
+            {
+                return true;
+            }
+
+            var cornerDistance_sq = Math.Pow((circleDistanceX - rectWidth / 2), 2) + Math.Pow((circleDistanceY - rectHeight / 2), 2);
+            return (cornerDistance_sq <= Math.Pow((ball.Diameter/2), 2));
+        }
+
     }
 }
