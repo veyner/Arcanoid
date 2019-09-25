@@ -249,6 +249,11 @@ namespace Arcanoid
         }
 
         /// <summary>
+        /// Номер части платформы
+        /// </summary>
+        enum PlatformPart : int {First=1, Second, Third, Forth, Fifth, Left, Right};
+
+        /// <summary>
         /// Расчет, в какую часть платформы прилетел шарик
         /// </summary>
         /// <param name="ball"></param>
@@ -286,25 +291,32 @@ namespace Arcanoid
             var platformAngle3 = platformAngle2 + platformPartAngle;
             var platformAngle4 = platformAngle3 + platformPartAngle;
 
-            //номер части платформы, с которой столкнулся шарик (15 - 1 и 5 части платформы, 24 - 2 и 4 части платформы, 3 - центральная часть платформы, 6-7 -если шарик столкнулся с боковыми сторонами)
-            var platformPartNumber = 0; 
+            var platformPartNumber = 0;
             //Проверка в какую часть платформы прилетел шарик
             
             if (ballAngle > topLeft && ballAngle < topright)
             {
-                if (topLeft <= ballAngle && ballAngle <= platformAngle1 || platformAngle4 <= ballAngle && ballAngle <= topright)
+                if (topLeft <= ballAngle && ballAngle <= platformAngle1)
                 {
-                    platformPartNumber = 15;
+                    platformPartNumber = (int)PlatformPart.Fifth;
                 }
-                else if (platformAngle1 < ballAngle && ballAngle < platformAngle2 || platformAngle3 < ballAngle && ballAngle < platformAngle4)
+                else if(platformAngle4 <= ballAngle && ballAngle <= topright)
+                {
+                    platformPartNumber = (int)PlatformPart.Fifth;
+                }
+                else if(platformAngle3 < ballAngle && ballAngle < platformAngle4)
+                {
+                    platformPartNumber = (int)PlatformPart.Forth;
+                }
+                else if (platformAngle1 < ballAngle && ballAngle < platformAngle2)
                 {
                     
-                    platformPartNumber = 24;
+                    platformPartNumber = (int)PlatformPart.Second;
                 }
                 else if (platformAngle2 <= ballAngle && ballAngle <= platformAngle3)
                 {
                     
-                    platformPartNumber = 3;
+                    platformPartNumber = (int)PlatformPart.Third;
                 }
             }
             
@@ -312,11 +324,11 @@ namespace Arcanoid
             {
                 if (0 <= ballAngle && ballAngle < topLeft || ballAngle <= 360 && botLeft <= ballAngle)
                 {
-                    platformPartNumber = 6;
+                    platformPartNumber = (int)PlatformPart.Left;
                 }
                 else if (topright <= ballAngle && ballAngle <= botRight)
                 {
-                    platformPartNumber = 7;
+                    platformPartNumber = (int)PlatformPart.Right;
                 }
                 
             }
@@ -325,11 +337,11 @@ namespace Arcanoid
                 if (0 <= ballAngle && ballAngle <= topLeft || ballAngle <= 360 && botLeft <= ballAngle)
                 {
                     
-                    platformPartNumber = 6;
+                    platformPartNumber = (int)PlatformPart.Left;
                 }
                 else if (topright < ballAngle && ballAngle <= botRight)
                 {
-                    platformPartNumber = 7;
+                    platformPartNumber = (int)PlatformPart.Right;
                 }
             }
             return platformPartNumber;
@@ -344,7 +356,7 @@ namespace Arcanoid
             if(platformPart != 0)
             {
                 //У каждой части платформы свой угол отбития шарика
-                if (platformPart == 15)
+                if (platformPart == 1 || platformPart == 5)
                 {
                     if (_ballVector.X < 0)
                     {
@@ -356,7 +368,7 @@ namespace Arcanoid
                     }
                     _ballVector.Y = _firstAndFifthPlatDirect.Y;
                 }
-                else if (platformPart == 24)
+                else if (platformPart == 2 || platformPart == 4)
                 {
                     if (_ballVector.X < 0)
                     {
@@ -455,6 +467,11 @@ namespace Arcanoid
             }
             return ballAngle;
         }
+
+        enum BlockPart : int
+        {
+            Left = 1, Top, Right,Bottom
+        }
         
         /// <summary>
         /// Изменение направления движения шарика при столкновении с единичным блоком
@@ -479,44 +496,44 @@ namespace Arcanoid
             {
                 if (botRight < ballAngle && ballAngle <= botLeft)
                 {
-                    blockSide = 4;
+                    blockSide = (int)BlockPart.Bottom;
                 }
                 else if (topright <= ballAngle && ballAngle < botRight)
                 {
-                    blockSide = 3;
+                    blockSide = (int)BlockPart.Right;
                 }
             }
             else if (_ballVector.X > 0 && _ballVector.Y > 0)
             {
                 if (0 <= ballAngle && ballAngle < topleft || botLeft <= ballAngle && ballAngle <= 360)
                 {
-                    blockSide = 1;
+                    blockSide = (int)BlockPart.Left;
                 }
                 else if (topleft < ballAngle && ballAngle <= topright)
                 {
-                    blockSide = 2;
+                    blockSide = (int)BlockPart.Top;
                 }
             }
             else if (_ballVector.X < 0 && _ballVector.Y > 0)
             {
                 if (topleft <= ballAngle && ballAngle < topright)
                 {
-                    blockSide = 2;
+                    blockSide = (int)BlockPart.Top;
                 }
                 else if (topright < ballAngle && ballAngle <= botRight)
                 {
-                    blockSide = 3;
+                    blockSide = (int)BlockPart.Right;
                 }
             }
             else if (_ballVector.X > 0 && _ballVector.Y < 0)
             {
                 if (botRight <= ballAngle && ballAngle < botLeft)
                 {
-                    blockSide = 4;
+                    blockSide = (int)BlockPart.Bottom;
                 }
                 else if (0 <= ballAngle && ballAngle <= topleft || botLeft < ballAngle && ballAngle <= 360)
                 {
-                    blockSide = 1;
+                    blockSide = (int)BlockPart.Left;
                 }
             }
             return blockSide;
